@@ -1,5 +1,5 @@
 // Service worker Syailun Trans: app tetap terbuka walau sinyal lemah
-const CACHE = 'syailun-trans-v17';
+const CACHE = 'syailun-trans-v18';
 const CORE = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE))); self.skipWaiting(); });
 self.addEventListener('activate', e => {

@@ -1311,10 +1311,11 @@ function renderChrome(base, isBiz){
     ${isBiz ? `<span class="badge gold hide-m">${bizName}</span>` : `<nav class="nav" aria-label="Navigasi utama">
       <a href="#beranda"${navOn('beranda')}>Beranda</a><a href="#cari"${navOn('cari')}>Cari kendaraan</a><a href="#akun" data-tab="pesanan"${navOn('akun')}>Pesanan saya</a><a href="#bantuan"${navOn('bantuan')}>Bantuan</a></nav>`}
     <div class="top-actions">
-      ${isBiz ? `<a class="btn btn-secondary btn-sm" href="#beranda">${ic('logout', 18)}<span class="hide-m">Ke situs pelanggan</span></a>` :
-      `<a class="icon-btn" href="#akun" aria-label="Favorit (${fav})" data-tab="favorit">${ic('heart')}${fav ? `<span class="count">${fav}</span>` : ''}</a>
-       <a class="btn btn-primary btn-sm hide-m" href="#cari">${ic('search', 18)}Cari kendaraan</a>`}
-      <button class="icon-btn" id="roleBtn" aria-label="Pilih portal">${ic('layout')}</button>
+      ${isBiz ? `<a class="btn btn-secondary btn-sm" href="#beranda">${ic('logout', 18)}<span class="hide-m">Ke situs pelanggan</span></a>
+       <button class="icon-btn" id="roleBtn" aria-label="Pilih portal">${ic('layout')}</button>` :
+      `<button class="icon-btn" id="roleBtn" aria-label="Pilih portal">${ic('layout')}</button>
+       <a class="btn btn-primary btn-sm hide-m" href="#cari">${ic('search', 18)}Cari kendaraan</a>
+       <a class="icon-btn" href="#akun" data-tab="profil" aria-label="Akun saya"${base === 'akun' ? ' aria-current="page"' : ''}>${ic('user')}</a>`}
     </div></div>`;
   $('#bnav').innerHTML = isBiz ? '' : `
     <a href="#beranda"${navOn('beranda')}>${ic('home', 22)}Beranda</a>
@@ -1434,7 +1435,7 @@ ROUTES.beranda = () => {
   </div></section>
 
   <section class="sec" style="padding-top:28px"><div class="wrap">
-    <div class="sec-head"><div><h2>Pilih sesuai kebutuhan</h2><p class="muted">Dari motor harian sampai minibus untuk rombongan.</p></div></div>
+    <div class="sec-head"><div><h2>Pilih sesuai kebutuhan Anda</h2><p class="muted">Dari motor harian, mobil keluarga, SUV, hingga kendaraan rombongan.</p></div></div>
     <div class="cats">${cats.map(c => { const n = pub.filter(v => v.kategori === c.id).length; return `<button class="cat" data-cat="${c.id}"><span class="ci">${ic(c.ikon, 24)}</span><b>${esc(c.nama)}</b><small>${n} kendaraan</small></button>`; }).join('')}</div>
   </div></section>
 
