@@ -1285,6 +1285,7 @@ const ROUTES = {};
 let current = '';
 function go(h){ if(location.hash === '#' + h) render(); else location.hash = h; }
 function render(){
+  if(!S) return;
   const h = location.hash.slice(1) || 'beranda';
   current = h;
   if(typeof closeModal === 'function') closeModal();
@@ -1334,7 +1335,7 @@ function renderChrome(base, isBiz){
   $('#foot').hidden = isBiz;
   $('#roleBtn').onclick = openPortals;
 }
-function openPortals(){ modal('Masuk ke portal', `<p class="muted" style="margin-bottom:16px">Mode demo: belum ada login. Pilih tampilan yang ingin dicoba. Pada versi produksi, setiap portal memerlukan akun dengan hak akses berbeda.</p>
+function openPortals(){ modal('Masuk ke portal', `<p class="muted" style="margin-bottom:16px">Admin dan Super Admin perlu masuk dengan akun pengelola. Pelanggan tidak perlu akun.</p>
     <div class="stack">${[['beranda','user','Pelanggan','Cari, pesan, dan kelola sewa'],['admin','clip','Admin','Armada, harga, reservasi, serah terima, perawatan, pendapatan'],['superadmin','layout','Super Admin','Kendali penuh: mitra, komisi, promo, pengaturan sistem']].map(r => `<a class="choice" href="#${r[0]}" data-close style="text-decoration:none"><span class="cat ci" style="padding:0;border:0;background:none">${ic(r[1], 22)}</span><span><b>${r[2]}</b><small>${r[3]}</small></span>${ic('chevR', 18, 'style="margin-left:auto;align-self:center"')}</a>`).join('')}</div>`); }
 document.addEventListener('click', e => { const a = e.target.closest('a[data-tab]'); if(a) S.ui.akunTab = a.dataset.tab; });
 const myBooking = b => !!b.milikSaya;
@@ -2375,7 +2376,7 @@ ROUTES.mitra = () => {
   const myV = S.vehicles.filter(v => v.mitra === p.id), myB = S.bookings.filter(b => vOf(b).mitra === p.id && b.status !== 'batal');
   const items = [['ringkasan', 'layout', 'Ringkasan'], ['kendaraan', 'car', 'Kendaraan', myV.length], ['kalender', 'calendar', 'Kalender'], ['pesanan', 'ticket', 'Pesanan', myB.filter(b => LOCK.includes(b.status)).length], ['pendapatan', 'wallet', 'Pendapatan'], ['profil', 'store', 'Profil usaha'], ['daftar', 'plus', 'Daftar mitra baru']];
   const net = b => paidRev(b) - commission(b);
-  const sel = `<label class="row" style="gap:8px;font-size:.88rem;color:var(--muted)">Masuk sebagai (demo)<select class="field" id="pSel" style="width:auto">${S.partners.map(x => `<option value="${x.id}" ${x.id === p.id ? 'selected' : ''}>${esc(x.nama)}</option>`).join('')}</select></label>`;
+  const sel = `<label class="row" style="gap:8px;font-size:.88rem;color:var(--muted)">Usaha<select class="field" id="pSel" style="width:auto">${S.partners.map(x => `<option value="${x.id}" ${x.id === p.id ? 'selected' : ''}>${esc(x.nama)}</option>`).join('')}</select></label>`;
   const banner = p.status === 'menunggu' ? `<div class="alert warn" style="margin-bottom:18px">${ic('clock', 18)}<span>Pendaftaran usaha ini menunggu persetujuan Super Admin. Kendaraan belum tampil ke pelanggan.</span></div>` : p.status === 'nonaktif' || p.status === 'ditolak' ? `<div class="alert err" style="margin-bottom:18px">${ic('alert', 18)}<span>Akun mitra ini ${p.status === 'ditolak' ? 'ditolak' : 'dinonaktifkan'}. Hubungi admin platform.</span></div>` : '';
   let body = '';
   if(tab === 'ringkasan'){
@@ -2615,9 +2616,9 @@ function customersList(){
   return Object.values(map);
 }
 ROUTES.admin = () => {
-  const tab = S.ui.adminTab || 'ringkasan';
+  let tab = S.ui.adminTab || 'ringkasan'; if(tab === 'data') tab = 'pengguna';
   const pendP = S.partners.filter(p => p.status === 'menunggu').length, pendV = S.vehicles.filter(v => v.status === 'menunggu').length, newT = S.tickets.filter(t => t.status === 'baru').length;
-  const items = [['ringkasan', 'layout', 'Ringkasan'], ['transaksi', 'wallet', 'Transaksi'], ['mitra', 'store', 'Mitra', pendP], ['kendaraan', 'car', 'Kendaraan', pendV], ['pelanggan', 'users', 'Pelanggan'], ['promo', 'megaphone', 'Promo'], ['kategori', 'folder', 'Kategori'], ['dukungan', 'headset', 'Dukungan', newT], ['pengaturan', 'sliders', 'Pengaturan'], ['data', 'db', 'Data demo']];
+  const items = [['ringkasan', 'layout', 'Ringkasan'], ['transaksi', 'wallet', 'Transaksi'], ['mitra', 'store', 'Mitra', pendP], ['kendaraan', 'car', 'Kendaraan', pendV], ['pelanggan', 'users', 'Pelanggan'], ['promo', 'megaphone', 'Promo'], ['kategori', 'folder', 'Kategori'], ['dukungan', 'headset', 'Dukungan', newT], ['pengaturan', 'sliders', 'Pengaturan'], ['pengguna', 'users', 'Pengguna & peran']];
   let body = '';
   if(tab === 'ringkasan'){
     const valid = S.bookings.filter(b => b.status !== 'batal');
@@ -2676,6 +2677,14 @@ ROUTES.admin = () => {
       <div class="card pad stack"><h3>Ketentuan</h3><div class="fi"><label class="l" for="sSyarat">Syarat sewa (satu baris satu syarat)</label><textarea class="field" id="sSyarat" rows="6">${esc(s.syarat.join('\n'))}</textarea></div><div class="fi"><label class="l" for="sBatal">Kebijakan pembatalan</label><textarea class="field" id="sBatal">${esc(s.batal)}</textarea></div></div>
       <button class="btn btn-primary" type="submit" style="justify-self:start">Simpan pengaturan</button></form>`;
   }
+  if(tab === 'pengguna'){
+    body = head('Pengguna & peran', 'Atur siapa yang bisa masuk sebagai Admin atau Super Admin.') + `<div id="staffBox"><div class="card pad"><span class="spinner" style="display:inline-block;vertical-align:middle;color:var(--primary)"></span> Memuat daftar pengelola…</div></div>
+      <form class="card pad stack" id="roleForm" style="margin-top:16px;max-width:680px" novalidate><h3>Tetapkan peran</h3>
+        <p class="muted" style="font-size:.9rem">Buat akunnya terlebih dahulu di dasbor Supabase (Authentication, lalu Users, lalu Add user). Setelah itu tetapkan perannya di sini.</p>
+        <div class="grid2"><div class="fi"><label class="l" for="rfEmail">Email akun</label><input class="field" id="rfEmail" type="email" inputmode="email"></div>
+        <div class="fi"><label class="l" for="rfRole">Peran</label><select class="field" id="rfRole"><option value="admin">Admin</option><option value="superadmin">Super Admin</option></select></div></div>
+        <button class="btn btn-primary" type="submit" style="justify-self:start">Simpan peran</button></form>`;
+  }
   if(tab === 'data'){
     let size = 0; try{ size = (localStorage.getItem(KEY) || '').length; }catch(e){}
     body = head('Data demo', 'Penjelasan penyimpanan pada prototipe ini.') + `<div class="stack" style="max-width:760px">
@@ -2724,6 +2733,31 @@ ROUTES.admin.after = () => {
       maps:$('#sMaps').value.trim(), lat:parseFloat($('#sLat').value) || S.settings.lat, lng:parseFloat($('#sLng').value) || S.settings.lng});
     const p1 = S.partners.find(p => p.utama); if(p1){ p1.nama = S.settings.nama; p1.hp = wa; }
     save(); toast('Pengaturan disimpan'); render(); };
+  const sb = $('#staffBox');
+  if(sb){
+    const ROLE = {admin:'Admin', superadmin:'Super Admin'};
+    const loadStaff = async () => {
+      if(!DB.online){ sb.innerHTML = `<div class="card">${emptyState('users', 'Butuh koneksi server', 'Daftar pengelola tampil pada website yang sudah online.')}</div>`; return; }
+      try{
+        const L = await rest.rpc('list_staff');
+        sb.innerHTML = tbl(['Email', 'Nama', 'Peran', 'Terakhir masuk'], L.map(u => `<tr><td><b>${esc(u.email)}</b>${DB.user && DB.user.id === u.id ? ' <span class="badge info">Anda</span>' : ''}</td><td>${esc(u.nama || '-')}</td>
+          <td><select class="field" data-remail="${esc(u.email)}" style="width:auto"><option value="">Tanpa akses</option>${Object.keys(ROLE).map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${ROLE[r]}</option>`).join('')}</select></td>
+          <td>${u.last_sign_in_at ? fmtDT(u.last_sign_in_at) : '<span class="muted">Belum pernah</span>'}</td></tr>`), emptyState('users', 'Belum ada akun', 'Tambahkan akun di dasbor Supabase.'));
+        $$('[data-remail]').forEach(s => s.onchange = async () => {
+          try{ await rest.rpc('set_staff_role', {p_email:s.dataset.remail, p_role:s.value || null}); toast('Peran diperbarui'); }
+          catch(e){ toast(e.message, 'err'); } loadStaff();
+        });
+      }catch(e){ sb.innerHTML = `<div class="alert err">${ic('alert', 18)}<span>Gagal memuat: ${esc(e.message)}</span></div>`; }
+    };
+    loadStaff();
+    $('#roleForm').onsubmit = async e => {
+      e.preventDefault(); const em = $('#rfEmail').value.trim();
+      if(!fieldErr($('#rfEmail'), !em || !validEmail(em) ? 'Isi email yang valid.' : '')) return;
+      if(!DB.online){ toast('Butuh koneksi server', 'err'); return; }
+      try{ await rest.rpc('set_staff_role', {p_email:em, p_role:$('#rfRole').value}); toast('Peran ditetapkan'); e.target.reset(); loadStaff(); }
+      catch(x){ fieldErr($('#rfEmail'), x.message); }
+    };
+  }
   const rd = $('#resetDemo'); if(rd) rd.onclick = () => confirmBox('Atur ulang data demo?', 'Semua perubahan di perangkat ini akan hilang.', 'Atur ulang', () => { S = seed(); save(); BK = null; toast('Data demo dipulihkan'); render(); }, true);
 };
 
@@ -2734,7 +2768,7 @@ const ADMIN_TABS = [
   ['hariini', 'layout', 'Hari ini', 'ops', 'ringkasan'], ['reservasi', 'ticket', 'Reservasi', 'ops', 'reservasi'],
   ['kendaraan', 'car', 'Kendaraan', 'mitra', 'kendaraan'], ['kalender', 'calendar', 'Kalender', 'mitra', 'kalender'],
   ['armada', 'clip', 'Status armada', 'ops', 'armada'], ['perawatan', 'wrench', 'Perawatan', 'ops', 'perawatan'],
-  ['verifikasi', 'idcard', 'Verifikasi pelanggan', 'ops', 'verifikasi'], ['usaha', 'chart', 'Ringkasan usaha', 'mitra', 'ringkasan'],
+  ['usaha', 'chart', 'Ringkasan usaha', 'mitra', 'ringkasan'],
   ['pendapatan', 'wallet', 'Pendapatan', 'mitra', 'pendapatan'], ['laporan', 'chart', 'Laporan', 'ops', 'laporan'], ['profil', 'store', 'Profil usaha', 'mitra', 'profil']];
 ROUTES.admin = () => {
   const tab = ADMIN_TABS.find(t => t[0] === S.ui.adminGabungTab) || ADMIN_TABS[0];
@@ -2755,9 +2789,365 @@ ROUTES.mitra = () => { setTimeout(() => go('admin'), 0); return ''; };
 ROUTES.operasional = () => { setTimeout(() => go('admin'), 0); return ''; };
 
 /* ===== Mulai ===== */
+/* Aplikasi dimulai oleh db.js (boot) */
+
+/* ===================== KONEKSI SUPABASE ===================== */
+const SB_URL = 'https://mekjqcdxyahezkehzlfa.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1la2pxY2R4eWFoZXprZWh6bGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2OTcxNDQsImV4cCI6MjEwOTI3MzE0NH0.yGGccpXzqPx-ALIJNDT_vOEFgY7N67OHEGys9a_M6tQ';
+const DB = {online:false, staff:false, role:null, user:null, ranges:[], snap:{}, syncing:Promise.resolve(), last:0, next:null};
+const SES_KEY = 'syailun_sesi', LOC_KEY = 'syailun_lokal_v1';
+let SES = null; try{ SES = JSON.parse(localStorage.getItem(SES_KEY)); }catch(e){}
+const saveSes = () => { try{ SES ? localStorage.setItem(SES_KEY, JSON.stringify(SES)) : localStorage.removeItem(SES_KEY); }catch(e){} };
+function setSes(j){
+  SES = {access_token:j.access_token, refresh_token:j.refresh_token, expires_at:j.expires_at || Math.floor(Date.now() / 1000) + (+j.expires_in || 3600),
+    user:j.user ? {id:j.user.id, email:j.user.email} : (SES && SES.user) || null};
+  saveSes();
+}
+async function token(){
+  if(SES && SES.expires_at * 1000 < Date.now() + 60000){
+    try{
+      const r = await fetch(SB_URL + '/auth/v1/token?grant_type=refresh_token', {method:'POST', headers:{apikey:SB_KEY, 'Content-Type':'application/json'}, body:JSON.stringify({refresh_token:SES.refresh_token})});
+      if(!r.ok) throw new Error('refresh'); setSes(await r.json());
+    }catch(e){ SES = null; saveSes(); DB.role = null; DB.staff = false; }
+  }
+  return SES ? SES.access_token : SB_KEY;
+}
+async function api(path, o = {}){
+  const t = await token(), h = {apikey:SB_KEY, Authorization:'Bearer ' + t};
+  if(o.body !== undefined && !o.raw) h['Content-Type'] = 'application/json';
+  const r = await fetch(SB_URL + path, {method:o.method || 'GET', headers:Object.assign(h, o.headers || {}), body:o.raw ? o.body : (o.body !== undefined ? JSON.stringify(o.body) : undefined)});
+  const txt = await r.text(); let j = null; try{ j = txt ? JSON.parse(txt) : null; }catch(e){ j = txt; }
+  if(!r.ok){ const m = (j && (j.message || j.msg || j.error_description || j.error)) || ('Galat server ' + r.status); throw new Error(m); }
+  return j;
+}
+const rest = {
+  get:(t, q = 'select=*') => api(`/rest/v1/${t}?${q}`),
+  ins:(t, row) => api(`/rest/v1/${t}`, {method:'POST', body:row, headers:{Prefer:'return=representation'}}),
+  insMin:(t, row) => api(`/rest/v1/${t}`, {method:'POST', body:row, headers:{Prefer:'return=minimal'}}),
+  upd:(t, key, val, row) => api(`/rest/v1/${t}?${key}=eq.${encodeURIComponent(val)}`, {method:'PATCH', body:row, headers:{Prefer:'return=minimal'}}),
+  del:(t, key, val) => api(`/rest/v1/${t}?${key}=eq.${encodeURIComponent(val)}`, {method:'DELETE'}),
+  rpc:(fn, args) => api(`/rest/v1/rpc/${fn}`, {method:'POST', body:args || {}})
+};
+
+/* ===================== PEMETAAN BARIS DATABASE <-> APLIKASI ===================== */
+const M = {
+  veh:{key:'id',
+    from:r => Object.assign({id:r.id, nama:r.nama, kategori:r.kategori, harga:r.harga, trans:r.trans, kap:r.kap, bbm:r.bbm,
+      paket:{lepas:r.paket_lepas, sopir:r.paket_sopir, antar:r.paket_antar}, mitra:r.partner_id, status:r.status, aktif:r.aktif, unggulan:r.unggulan, dipesan:r.dipesan},
+      r.foto && r.foto.startsWith('bawaan:') ? {foto:r.foto.slice(7)} : {img:r.foto || ''}),
+    to:v => ({id:v.id, partner_id:v.mitra, kategori:v.kategori, nama:v.nama, harga:v.harga, trans:v.trans, kap:v.kap, bbm:v.bbm,
+      paket_lepas:!!v.paket.lepas, paket_sopir:!!v.paket.sopir, paket_antar:!!v.paket.antar, foto:v.img ? v.img : (v.foto ? 'bawaan:' + v.foto : null),
+      status:v.status, aktif:!!v.aktif, unggulan:!!v.unggulan})},
+  partner:{key:'id',
+    from:r => ({id:r.id, nama:r.nama, pemilik:r.pemilik || '', hp:r.hp || '', kota:r.kota || '', status:r.status, komisi:+r.komisi, utama:r.utama, dibuat:r.created_at}),
+    to:p => ({id:p.id, nama:p.nama, pemilik:p.pemilik, hp:p.hp, kota:p.kota, status:p.status, komisi:+p.komisi, utama:!!p.utama})},
+  cat:{key:'id', from:r => ({id:r.id, nama:r.nama, ikon:r.ikon, tampil:r.tampil, urutan:r.urutan}),
+    to:(c, i) => ({id:c.id, nama:c.nama, ikon:c.ikon, tampil:!!c.tampil, urutan:c.urutan ?? i})},
+  block:{key:'id', genId:true, from:r => ({id:r.id, vid:r.vehicle_id, from:r.dari, to:r.sampai, ket:r.ket || '', jenis:r.jenis}),
+    to:b => ({id:b.id, vehicle_id:b.vid, dari:b.from, sampai:b.to, ket:b.ket, jenis:b.jenis || 'tutup'})},
+  promo:{key:'kode', from:r => ({kode:r.kode, judul:r.judul, persen:r.persen, minHari:r.min_hari, aktif:r.aktif}),
+    to:p => ({kode:p.kode, judul:p.judul, persen:p.persen, min_hari:p.minHari, aktif:!!p.aktif})},
+  booking:{key:'id', noInsert:true, noDelete:true,
+    from:r => ({id:r.id, dibuat:r.created_at, vid:r.vehicle_id, pelanggan:{nama:r.nama, hp:r.hp, email:r.email || ''}, ambil:r.ambil, kembali:r.kembali,
+      mulai:r.mulai, jamMulai:r.jam_mulai, selesai:r.selesai, jamSelesai:r.jam_selesai, hari:r.hari, paket:r.paket, khusus:r.khusus || '', hargaKhusus:r.harga_khusus,
+      perlindungan:r.perlindungan, catatan:r.catatan || '', promo:r.promo || '', harga:r.harga, status:r.status, bayar:r.bayar || {metode:'', status:'belum'},
+      deposit:r.deposit || {status:'belum'}, kerusakan:r.kerusakan || [], serah:r.serah, lebih:r.lebih, kembaliAktual:r.kembali_aktual, ulasan:r.ulasan}),
+    to:b => ({id:b.id, status:b.status, bayar:b.bayar, deposit:b.deposit, kerusakan:b.kerusakan || [], serah:b.serah || null, lebih:b.lebih || null,
+      kembali_aktual:b.kembaliAktual || null, harga:b.harga, harga_khusus:b.hargaKhusus ?? null, selesai:b.selesai, jam_selesai:b.jamSelesai, hari:b.hari})},
+  ticket:{key:'id', noInsert:true, noDelete:true, from:r => ({id:r.id, t:r.created_at, nama:r.nama, hp:r.hp, topik:r.topik, pesan:r.pesan, status:r.status}),
+    to:t => ({id:t.id, status:t.status})}
+};
+const COLL = {vehicles:['vehicles', 'veh'], partners:['partners', 'partner'], cats:['categories', 'cat'], blocks:['blocks', 'block'], promos:['promos', 'promo'], bookings:['bookings', 'booking'], tickets:['tickets', 'ticket']};
+function snapTake(){
+  for(const [k, [, m]] of Object.entries(COLL)){ const mp = M[m], o = {}; (S[k] || []).forEach((x, i) => { const row = mp.to(x, i); o[String(row[mp.key])] = JSON.stringify(row); }); DB.snap[k] = o; }
+  DB.snap.settings = JSON.stringify(S.settings);
+}
+
+/* ===================== DATA LOKAL PERANGKAT (favorit, profil, pesanan saya) ===================== */
+function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LOC_KEY)) || {}; }catch(e){ return {}; } }
+function saveLocal(){
+  try{ localStorage.setItem(LOC_KEY, JSON.stringify({favorit:S.favorit, banding:S.banding, profile:S.profile, ui:S.ui, mine:S.mine || [],
+    notifs:(S.notifs || []).filter(n => n.target === 'pelanggan').slice(0, 40)})); }catch(e){}
+}
+
+async function loadRole(){
+  if(!SES || !SES.user){ DB.role = null; DB.staff = false; DB.user = null; return; }
+  const p = await rest.get('profiles', `select=role,nama,email&id=eq.${SES.user.id}`);
+  DB.user = SES.user; DB.role = p[0] ? p[0].role : null; DB.staff = DB.role === 'admin' || DB.role === 'superadmin';
+}
+async function fetchAll(){
+  const [st, cats, partners, vehicles, promos, reviews, ranges] = await Promise.all([
+    rest.get('settings', 'select=data&id=eq.1'), rest.get('categories', 'select=*&order=urutan'), rest.get('partners', 'select=*&order=created_at'),
+    rest.get('vehicles', 'select=*&order=created_at'), rest.get('promos'), rest.get('reviews', 'select=vehicle_id,bintang,teks,nama,created_at&order=created_at'),
+    rest.rpc('public_ranges')]);
+  const L = loadLocal();
+  const n = {v:1, settings:Object.assign({}, (st[0] || {}).data), cats:cats.map(M.cat.from), partners:partners.map(M.partner.from), vehicles:vehicles.map(M.veh.from),
+    promos:promos.map(M.promo.from), reviews:reviews.map(r => ({vid:r.vehicle_id, bintang:r.bintang, teks:r.teks, nama:r.nama, t:r.created_at})),
+    bookings:[], blocks:[], tickets:[], notifs:(L.notifs || []), favorit:L.favorit || [], banding:L.banding || [],
+    profile:L.profile || {nama:'', hp:'', email:'', verifikasi:'belum'}, ui:L.ui || {partner:'p1'}, mine:L.mine || []};
+  if(!n.partners.some(p => p.id === n.ui.partner)) n.ui.partner = (n.partners.find(p => p.utama) || n.partners[0] || {}).id;
+  DB.ranges = ranges || [];
+  if(DB.staff){
+    const [bk, bl, tk, nf] = await Promise.all([rest.get('bookings', 'select=*&order=created_at.desc'), rest.get('blocks', 'select=*&order=dari'),
+      rest.get('tickets', 'select=*&order=created_at.desc'), rest.get('notifs', 'select=*&order=created_at.desc&limit=50')]);
+    n.bookings = bk.map(M.booking.from); n.blocks = bl.map(M.block.from); n.tickets = tk.map(M.ticket.from);
+    n.notifs = n.notifs.filter(x => x.target === 'pelanggan').concat(nf.map(x => ({id:x.id, t:x.created_at, text:x.teks, target:'ops', baca:x.dibaca})));
+  } else if(n.mine.length){
+    const byHp = {}; n.mine.forEach(m => { (byHp[normHp(m.hp)] = byHp[normHp(m.hp)] || []).push(m.id); });
+    for(const [hp, ids] of Object.entries(byHp)){ const rows = await rest.rpc('my_bookings', {p_ids:ids, p_hp:hp}); n.bookings.push(...rows.map(M.booking.from)); }
+  }
+  n.bookings.forEach(b => { if(n.mine.some(m => m.id === b.id)) b.milikSaya = true; });
+  S = n; snapTake(); DB.last = Date.now();
+}
+
+/* ===================== SIMPAN: perubahan pengelola dikirim ke server ===================== */
+async function uploadPhotos(){
+  for(const v of S.vehicles){
+    if(v.img && v.img.startsWith('data:')){
+      const blob = await (await fetch(v.img)).blob(), ext = blob.type === 'image/png' ? 'png' : blob.type === 'image/jpeg' ? 'jpg' : 'webp';
+      const path = `${v.id}-${Date.now().toString(36)}.${ext}`;
+      await api(`/storage/v1/object/vehicle-photos/${path}`, {method:'POST', body:blob, raw:true, headers:{'Content-Type':blob.type, 'x-upsert':'true'}});
+      const url = `${SB_URL}/storage/v1/object/public/vehicle-photos/${path}`, art = ART.get(v.img);
+      if(art) ART.set(url, art); v.img = url;
+    }
+  }
+}
+async function syncNow(){
+  if(!DB.online || !DB.staff) return;
+  await uploadPhotos();
+  for(const [k, [t, m]] of Object.entries(COLL)){
+    const mp = M[m], prev = DB.snap[k] || {}, seen = new Set(), list = S[k] || [];
+    for(let i = 0; i < list.length; i++){
+      const o = list[i], row = mp.to(o, i), key = String(row[mp.key]), js = JSON.stringify(row);
+      if(!(key in prev)){
+        if(mp.noInsert) continue;
+        const ins = Object.assign({}, row); if(mp.genId) delete ins.id;
+        if(k === 'vehicles') ins.dipesan = o.dipesan || 0;
+        const res = await rest.ins(t, ins); if(mp.genId && res && res[0]) o.id = res[0].id;
+        seen.add(String(mp.genId && res && res[0] ? res[0].id : key));
+      } else {
+        seen.add(key);
+        if(prev[key] !== js){ const up = Object.assign({}, row); delete up[mp.key]; await rest.upd(t, mp.key, key, up); }
+      }
+    }
+    if(!mp.noDelete) for(const key of Object.keys(prev)) if(!seen.has(key)) await rest.del(t, mp.key, key);
+  }
+  if(DB.role === 'superadmin' && JSON.stringify(S.settings) !== DB.snap.settings) await rest.upd('settings', 'id', 1, {data:S.settings, updated_at:new Date().toISOString()});
+  snapTake();
+}
+const saveDemo = save;
+save = function(){
+  if(!DB.online) return saveDemo();
+  saveLocal();
+  if(DB.staff){
+    DB.syncing = DB.syncing.then(syncNow).catch(async e => {
+      toast('Gagal menyimpan ke server: ' + e.message, 'err');
+      try{ await fetchAll(); await prepArt(); render(); }catch(x){}
+    });
+  }
+  return true;
+};
+
+/* ===================== KETERSEDIAAN UNTUK PELANGGAN ===================== */
+const rangesLocal = ranges;
+ranges = function(vid, exceptId){
+  if(DB.online && !DB.staff) return DB.ranges.filter(r => r.vehicle_id === vid).map(r => ({from:r.dari, to:r.sampai}));
+  return rangesLocal(vid, exceptId);
+};
+const refreshRanges = async () => { try{ DB.ranges = await rest.rpc('public_ranges'); }catch(e){} };
+
+/* ===================== PESAN: lewat fungsi server ===================== */
+const nextStepLocal = nextStep;
+nextStep = async function(){
+  if(!(DB.online && BK && BK.step === 4)) return nextStepLocal();
+  if(!BK.setuju){ fieldErr($('#setuju'), 'Centang persetujuan untuk melanjutkan.'); return; }
+  const btns = [$('#bkNext'), $('#bkNextM')].filter(Boolean); btns.forEach(b => { b.disabled = true; b.dataset.t = b.innerHTML; b.innerHTML = '<span class="spinner"></span>Memproses…'; });
+  try{
+    const r = await rest.rpc('create_booking', {p:{vid:BK.vid, nama:BK.nama.trim(), hp:BK.hp.trim(), email:BK.email.trim(), paket:BK.paket, khusus:BK.khusus,
+      ambil:BK.ambil, kembali:BK.kembali, mulai:BK.mulai, jamMulai:BK.jamMulai, selesai:BK.selesai, jamSelesai:BK.jamSelesai,
+      perlindungan:BK.perlindungan, catatan:BK.catatan, promo:BK.promo}});
+    const b = {id:r.id, dibuat:new Date().toISOString(), milikSaya:true, vid:BK.vid, pelanggan:{nama:BK.nama.trim(), hp:BK.hp.trim(), email:BK.email.trim()},
+      ambil:{...BK.ambil}, kembali:{...BK.kembali}, mulai:BK.mulai, jamMulai:BK.jamMulai, selesai:BK.selesai, jamSelesai:BK.jamSelesai, hari:r.hari,
+      paket:BK.paket, khusus:BK.khusus, perlindungan:BK.perlindungan, catatan:BK.catatan, promo:(r.harga && r.harga.diskon) ? BK.promo : '',
+      status:r.status, bayar:{metode:'', status:'belum'}, deposit:{status:'belum'}, kerusakan:[], serah:null, lebih:null, ulasan:null, harga:r.harga};
+    S.bookings.unshift(b); S.mine = S.mine || []; S.mine.push({id:r.id, hp:b.pelanggan.hp});
+    const v = veh(BK.vid); if(v) v.dipesan++;
+    DB.ranges.push({vehicle_id:BK.vid, dari:BK.mulai, sampai:addDays(BK.mulai, r.hari)});
+    notify(`Pesanan ${b.id} untuk ${(v || {}).nama} dibuat.`);
+    if(BK.simpan) Object.assign(S.profile, {nama:BK.nama.trim(), hp:BK.hp.trim(), email:BK.email.trim()});
+    saveLocal(); if(DB.staff){ snapTake(); }
+    BK.booking = b.id; BK.step = BK.paket === 'khusus' ? 6 : 5; drawBooking(); scrollTo(0, 0);
+  }catch(e){
+    btns.forEach(b => { b.disabled = false; b.innerHTML = b.dataset.t; });
+    toast(e.message || 'Pesanan gagal dibuat. Coba lagi.', 'err');
+    if(/terisi/i.test(e.message)){ await refreshRanges(); BK.step = 1; drawBooking(); }
+  }
+};
+const bindBayarLocal = bindBayar;
+bindBayar = function(){
+  bindBayarLocal();
+  if(!DB.online) return;
+  const sim = $('#paySim'); if(sim) sim.remove();
+  const b = S.bookings.find(x => x.id === BK.booking);
+  $$('input[name="metode"]').forEach(r => r.addEventListener('change', () => { rest.rpc('set_pay_method', {p_id:b.id, p_hp:b.pelanggan.hp, p_metode:r.value}).catch(() => {}); }));
+  rest.rpc('set_pay_method', {p_id:b.id, p_hp:b.pelanggan.hp, p_metode:BK.metode}).catch(() => {});
+};
+const bindAkunPesananLocal = bindAkunPesanan;
+bindAkunPesanan = function(){
+  bindAkunPesananLocal();
+  if(!DB.online) return;
+  $$('[data-cancel]').forEach(x => x.onclick = () => confirmBox('Batalkan pesanan?', `Pesanan ${x.dataset.cancel} akan dibatalkan dan tanggalnya dibuka kembali. ${esc(S.settings.batal)}`, 'Ya, batalkan', async () => {
+    const b = S.bookings.find(y => y.id === x.dataset.cancel);
+    try{ await rest.rpc('cancel_booking', {p_id:b.id, p_hp:b.pelanggan.hp}); b.status = 'batal'; notify(`Pesanan ${b.id} dibatalkan.`); await refreshRanges(); saveLocal(); if(DB.staff) snapTake(); toast('Pesanan dibatalkan'); go('akun'); }
+    catch(e){ toast(e.message, 'err'); }
+  }, true));
+};
+const openReviewLocal = openReview;
+openReview = function(id){
+  if(!DB.online) return openReviewLocal(id);
+  openReviewLocal(id);
+  const b = S.bookings.find(y => y.id === id);
+  $('#revOk').onclick = async () => {
+    const t = $('#revT').value.trim(), star = $$('[data-star] svg').filter(s => s.getAttribute('fill') === 'currentColor').length || 5;
+    if(!fieldErr($('#revT'), t.length < 10 ? 'Tulis ulasan minimal 10 karakter.' : '')) return;
+    try{ await rest.rpc('add_review', {p_id:b.id, p_hp:b.pelanggan.hp, p_bintang:star, p_teks:t}); b.ulasan = {bintang:star, teks:t};
+      S.reviews.push({vid:b.vid, bintang:star, teks:t, nama:b.pelanggan.nama.split(' ')[0], t:new Date().toISOString()}); saveLocal(); if(DB.staff) snapTake();
+      closeModal(); toast('Terima kasih atas ulasan Anda'); go('akun'); }
+    catch(e){ toast(e.message, 'err'); }
+  };
+};
+const bantuanAfterLocal = ROUTES.bantuan.after;
+ROUTES.bantuan.after = () => {
+  bantuanAfterLocal();
+  if(!DB.online) return;
+  $('#tiket').onsubmit = async e => {
+    e.preventDefault();
+    const n = $('#tNama').value.trim(), h = $('#tHp').value.trim(), p = $('#tPesan').value.trim();
+    const ok = [fieldErr($('#tNama'), n.length < 2 ? 'Isi nama Anda.' : ''), fieldErr($('#tHp'), !validHp(h) ? 'Isi nomor WhatsApp yang aktif.' : ''), fieldErr($('#tPesan'), p.length < 10 ? 'Tulis pertanyaan minimal 10 karakter.' : '')].every(Boolean);
+    if(!ok) return;
+    try{ await rest.insMin('tickets', {nama:n, hp:h, topik:$('#tTopik').value, pesan:p, status:'baru'}); e.target.reset(); toast('Pertanyaan terkirim. Admin akan membalas lewat WhatsApp.'); }
+    catch(x){ toast('Gagal mengirim: ' + x.message, 'err'); }
+  };
+};
+/* Profil pelanggan: verifikasi dilakukan saat serah terima */
+const akunProfilLocal = akunProfil;
+akunProfil = function(){
+  if(!DB.online) return akunProfilLocal();
+  const p = S.profile;
+  return `<div class="two" style="align-items:start">
+    <form class="card pad stack" id="profForm"><h3>Data diri</h3><p class="muted" style="font-size:.9rem">Disimpan di perangkat ini agar formulir pemesanan terisi otomatis.</p>
+      <div class="fi"><label class="l" for="pNama">Nama lengkap sesuai KTP</label><input class="field" id="pNama" value="${esc(p.nama)}" autocomplete="name"></div>
+      <div class="fi"><label class="l" for="pHp">Nomor WhatsApp</label><input class="field" id="pHp" value="${esc(p.hp)}" inputmode="tel" autocomplete="tel"></div>
+      <div class="fi"><label class="l" for="pEmail">Email (opsional)</label><input class="field" id="pEmail" value="${esc(p.email)}" type="email" autocomplete="email"></div>
+      <button class="btn btn-primary" type="submit">Simpan profil</button></form>
+    <div class="card pad stack"><h3>Dokumen saat serah terima</h3><p class="muted">Petugas mencocokkan dokumen asli Anda saat kendaraan diserahkan.</p>
+      <ul style="margin:0;padding-left:20px">${S.settings.syarat.map(x => `<li style="margin-bottom:6px">${esc(x)}</li>`).join('')}</ul></div></div>`;
+};
+
+/* ===================== LOGIN PENGELOLA ===================== */
+ROUTES.masuk = () => `<div class="wrap" style="max-width:480px;padding:48px 16px 64px">
+  <form class="card pad stack" id="loginForm" novalidate>
+    <p class="eyebrow">Khusus pengelola</p><h2 style="font-size:2rem">Masuk</h2>
+    <p class="muted">Untuk Admin dan Super Admin ${esc(S.settings.nama)}.</p>
+    ${DB.online ? '' : `<div class="alert warn">${ic('alert', 18)}<span>Tidak tersambung ke server. Login hanya bisa dilakukan pada website yang sudah online.</span></div>`}
+    <div class="fi"><label class="l" for="lgEmail">Email</label><input class="field" id="lgEmail" type="email" autocomplete="username" inputmode="email"></div>
+    <div class="fi"><label class="l" for="lgPass">Kata sandi</label><input class="field" id="lgPass" type="password" autocomplete="current-password"></div>
+    <button class="btn btn-primary" type="submit" id="lgBtn" ${DB.online ? '' : 'disabled'}>Masuk</button>
+    <button type="button" class="link" id="lgLupa" style="justify-self:start">Lupa kata sandi?</button>
+    <p class="ferr" id="lgErr" role="alert"></p>
+  </form></div>`;
+ROUTES.masuk.after = () => {
+  $('#loginForm').onsubmit = async e => {
+    e.preventDefault();
+    const em = $('#lgEmail').value.trim(), pw = $('#lgPass').value, err = $('#lgErr'), btn = $('#lgBtn');
+    if(!fieldErr($('#lgEmail'), !validEmail(em) || !em ? 'Isi email yang valid.' : '') | !fieldErr($('#lgPass'), pw.length < 6 ? 'Isi kata sandi.' : '')) return;
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Memeriksa…'; err.textContent = '';
+    try{
+      const r = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {method:'POST', headers:{apikey:SB_KEY, 'Content-Type':'application/json'}, body:JSON.stringify({email:em, password:pw})});
+      const j = await r.json(); if(!r.ok) throw new Error(/invalid/i.test(j.error_description || j.msg || '') ? 'Email atau kata sandi salah.' : (j.error_description || j.msg || 'Gagal masuk.'));
+      setSes(j); await loadRole();
+      if(!DB.staff){ SES = null; saveSes(); throw new Error('Akun ini belum memiliki akses pengelola. Hubungi Super Admin.'); }
+      await fetchAll(); await prepArt(); toast('Selamat datang, ' + (DB.role === 'superadmin' ? 'Super Admin' : 'Admin'));
+      go(DB.next && (DB.next !== 'superadmin' || DB.role === 'superadmin') ? DB.next : (DB.role === 'superadmin' ? 'superadmin' : 'admin')); DB.next = null;
+    }catch(x){ err.textContent = x.message; btn.disabled = false; btn.textContent = 'Masuk'; }
+  };
+  $('#lgLupa').onclick = async () => {
+    const em = $('#lgEmail').value.trim();
+    if(!fieldErr($('#lgEmail'), !em || !validEmail(em) ? 'Isi email Anda dulu, lalu ketuk lagi.' : '')) return;
+    try{ await fetch(SB_URL + '/auth/v1/recover?redirect_to=' + encodeURIComponent(location.origin + location.pathname), {method:'POST', headers:{apikey:SB_KEY, 'Content-Type':'application/json'}, body:JSON.stringify({email:em})});
+      toast('Jika email terdaftar, tautan atur ulang kata sandi sudah dikirim.'); }catch(x){ toast('Gagal mengirim tautan: ' + x.message, 'err'); }
+  };
+};
+async function logout(){
+  try{ await api('/auth/v1/logout', {method:'POST'}); }catch(e){}
+  SES = null; saveSes(); DB.role = null; DB.staff = false; DB.user = null;
+  try{ await fetchAll(); }catch(e){} toast('Anda sudah keluar'); go('beranda');
+}
+function showSetPassword(){
+  modal('Atur kata sandi baru', `<form class="stack" id="npForm" novalidate><p class="muted">Buat kata sandi baru untuk ${esc((SES && SES.user && SES.user.email) || 'akun Anda')}.</p>
+    <div class="fi"><label class="l" for="np1">Kata sandi baru (min. 8 karakter)</label><input class="field" id="np1" type="password" autocomplete="new-password"></div>
+    <div class="fi"><label class="l" for="np2">Ulangi kata sandi</label><input class="field" id="np2" type="password" autocomplete="new-password"></div></form>`,
+    `<button class="btn btn-primary" id="npOk">Simpan kata sandi</button>`);
+  $('#npOk').onclick = async () => {
+    const a = $('#np1').value, b = $('#np2').value;
+    if(!fieldErr($('#np1'), a.length < 8 ? 'Minimal 8 karakter.' : '') || !fieldErr($('#np2'), a !== b ? 'Kata sandi tidak sama.' : '')) return;
+    try{ await api('/auth/v1/user', {method:'PUT', body:{password:a}}); closeModal(); toast('Kata sandi diperbarui'); await loadRole(); await fetchAll(); render(); }
+    catch(e){ toast('Gagal: ' + e.message, 'err'); }
+  };
+}
+
+/* ===================== PENJAGA PINTU ADMIN & SUPER ADMIN ===================== */
+function guard(need, fn){
+  const ok = () => !DB.online || DB.role === 'superadmin' || (need === 'admin' && DB.role === 'admin');
+  const g = arg => { if(ok()) return fn(arg); DB.next = need; return ROUTES.masuk(); };
+  g.after = arg => { if(ok()) return fn.after(arg); ROUTES.masuk.after(); };
+  return g;
+}
+
+/* Header: tombol keluar saat pengelola masuk; banner demo hanya untuk pratinjau */
+const chromeBase = renderChrome;
+renderChrome = (base, isBiz) => {
+  chromeBase(base, isBiz);
+  const demo = $('.demo');
+  if(demo){ demo.hidden = DB.online; if(!DB.online) demo.innerHTML = '<b>Pratinjau.</b> Tidak tersambung ke server, menampilkan data contoh.'; }
+  if(isBiz && DB.online && DB.staff){
+    const ta = $('.top-actions');
+    if(ta && !$('#logoutBtn')) ta.insertAdjacentHTML('beforeend', `<span class="hide-m" style="font-size:.82rem;color:rgba(234,244,246,.7)">${esc(DB.user ? DB.user.email : '')}</span><button class="btn btn-secondary btn-sm" id="logoutBtn">${ic('logout', 16)}Keluar</button>`);
+    const lb = $('#logoutBtn'); if(lb) lb.onclick = logout;
+  }
+};
+
+ROUTES.admin = guard('admin', ROUTES.admin);
+ROUTES.superadmin = guard('superadmin', ROUTES.superadmin);
+
+/* ===================== MULAI ===================== */
 if('serviceWorker' in navigator && location.protocol === 'https:'){ navigator.serviceWorker.register('sw.js').catch(() => {}); }
-load();
-prepArt().then(render);
+async function boot(){
+  $('#app').innerHTML = `<div class="wrap" style="padding:80px 16px;text-align:center"><span class="spinner" style="display:inline-block;color:var(--primary)"></span><p class="muted" style="margin-top:12px">Memuat data…</p></div>`;
+  const hs = new URLSearchParams(location.hash.slice(1));
+  if(hs.get('access_token')){
+    setSes({access_token:hs.get('access_token'), refresh_token:hs.get('refresh_token'), expires_in:hs.get('expires_in'), user:null});
+    try{ const u = await api('/auth/v1/user'); SES.user = {id:u.id, email:u.email}; saveSes(); }catch(e){}
+    DB.recovery = hs.get('type') === 'recovery';
+    history.replaceState(null, '', location.pathname + (DB.recovery ? '#masuk' : '#admin'));
+  } else if(hs.get('error_description')){
+    toast(hs.get('error_description'), 'err'); history.replaceState(null, '', location.pathname);
+  }
+  try{
+    if(SES){ try{ await loadRole(); }catch(e){ SES = null; saveSes(); DB.role = null; DB.staff = false; } }
+    await fetchAll(); DB.online = true;
+  }catch(e){ DB.online = false; DB.staff = false; load(); }
+  await prepArt(); render();
+  if(DB.recovery && DB.online) showSetPassword();
+}
+document.addEventListener('visibilitychange', async () => {
+  if(document.visibilityState !== 'visible' || !DB.online || Date.now() - DB.last < 60000 || $('#modal').open) return;
+  const base = (location.hash.slice(1) || 'beranda').split('-')[0];
+  if(!['admin', 'superadmin', 'akun', 'beranda', 'cari'].includes(base)) return;
+  try{ await DB.syncing; await fetchAll(); await prepArt(); render(); }catch(e){}
+});
+
+boot();
 
 </script>
 </body>

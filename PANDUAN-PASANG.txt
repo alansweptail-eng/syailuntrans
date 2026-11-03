@@ -39,8 +39,19 @@ SEBELUM DIBAGIKAN KE PUBLIK
 - Setiap kali index.html diperbarui, ubah juga 'syailun-trans-v1' di sw.js
   (misalnya jadi v2) agar HP pelanggan mengambil versi terbaru.
 
-FOLDER supabase/
-- schema.sql : rancangan database untuk tahap produksi (pengguna & peran, mitra,
-  kendaraan, pesanan, pembayaran, serah terima, perawatan, promo, ulasan,
-  dukungan, pengaturan) lengkap dengan pencegah pesanan bentrok dan aturan akses.
-  Belum dijalankan ke proyek Supabase mana pun.
+
+DATABASE (SUPABASE)
+- Website ini sudah tersambung ke proyek Supabase "Syailun-Trans" (region Singapura).
+  Struktur database, aturan akses, dan data awal sudah terpasang langsung di proyek,
+  jadi tidak ada file SQL yang perlu dijalankan.
+- Login pengelola: buka alamat-website/#masuk
+  Super Admin : matrixum.global@gmail.com
+  Admin       : alansweptail@gmail.com
+
+SETELAH WEBSITE ONLINE (wajib, sekali saja)
+1. Dasbor Supabase > proyek Syailun-Trans > Authentication > URL Configuration
+   - Site URL: isi alamat website Anda (contoh https://syailuntrans.netlify.app)
+   - Redirect URLs: tambahkan alamat yang sama
+   Ini agar tautan "Lupa kata sandi" di email mengarah ke website Anda.
+2. Authentication > Sign In / Providers > Email: matikan "Allow new users to sign up".
+   Akun pengelola cukup dibuat lewat Authentication > Users > Add user.
