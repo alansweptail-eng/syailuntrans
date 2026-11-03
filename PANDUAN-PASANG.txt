@@ -1,0 +1,46 @@
+SYAILUN TRANS — PAKET APLIKASI ANDROID (PWA)
+============================================
+
+Isi paket
+- index.html      : aplikasi Syailun Trans (situs + panel Kelola)
+- manifest.json   : identitas aplikasi (nama, ikon, warna)
+- sw.js           : agar aplikasi bisa dipasang dan tetap terbuka saat sinyal lemah
+- icons/          : ikon aplikasi
+
+LANGKAH 1 — Online-kan (gratis, tanpa coding)
+1. Buka https://app.netlify.com/drop di laptop/HP.
+2. Ekstrak file zip ini, lalu seret FOLDER-nya ke halaman tersebut.
+3. Netlify memberi alamat, misalnya https://syailun-trans.netlify.app
+   (nama bisa diganti di Site settings, atau pakai domain sendiri).
+   Alternatif lain: GitHub Pages, Vercel, atau hosting milik sendiri. Wajib HTTPS.
+
+LANGKAH 2 — Pasang di HP Android (langsung bisa dipakai)
+1. Buka alamat tadi di Google Chrome.
+2. Ketuk tombol "Pasang aplikasi" di bagian atas, atau menu titik tiga
+   > "Instal aplikasi" / "Tambahkan ke layar utama".
+3. Ikon Syailun Trans muncul di layar HP dan terbuka layar penuh seperti aplikasi.
+   Bagikan alamat yang sama ke pelanggan agar mereka bisa memasangnya juga.
+
+LANGKAH 3 — (Opsional) Jadikan file APK / terbit di Google Play
+1. Buka https://www.pwabuilder.com dan masukkan alamat dari Langkah 1.
+2. Pilih Android > Generate Package. Hasilnya file .apk (untuk dibagikan langsung)
+   dan .aab (untuk diunggah ke Google Play Console, biaya daftar developer sekali bayar).
+3. Ikuti petunjuk PWABuilder untuk memasang file assetlinks.json ke hosting,
+   supaya aplikasi tampil tanpa bilah alamat browser.
+
+SEBELUM DIBAGIKAN KE PUBLIK
+- Buka menu Kelola (tautan di bagian bawah halaman) dan ganti nomor WhatsApp,
+  alamat garasi, jam operasional, harga, dan daftar armada sesuai data asli.
+- Data di panel Kelola saat ini tersimpan di HP/browser yang dipakai saja.
+  Pengaturan dari HP admin TIDAK otomatis berubah di HP pelanggan.
+  Agar perubahan harga & armada tampil ke semua pelanggan, ada dua cara:
+  (a) ubah data contoh langsung di index.html lalu unggah ulang, atau
+  (b) sambungkan ke database online (Supabase) + login admin — tahap berikutnya.
+- Setiap kali index.html diperbarui, ubah juga 'syailun-trans-v1' di sw.js
+  (misalnya jadi v2) agar HP pelanggan mengambil versi terbaru.
+
+FOLDER supabase/
+- schema.sql : rancangan database untuk tahap produksi (pengguna & peran, mitra,
+  kendaraan, pesanan, pembayaran, serah terima, perawatan, promo, ulasan,
+  dukungan, pengaturan) lengkap dengan pencegah pesanan bentrok dan aturan akses.
+  Belum dijalankan ke proyek Supabase mana pun.

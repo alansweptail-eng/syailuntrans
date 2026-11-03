@@ -1,0 +1,52 @@
+{
+  "name": "Syailun Trans — Sewa Motor & Mobil",
+  "short_name": "Syailun Trans",
+  "description": "Sewa motor, mobil, dan minibus. Lepas kunci atau dengan sopir.",
+  "lang": "id",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#061C24",
+  "theme_color": "#061C24",
+  "categories": [
+    "travel",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cari kendaraan",
+      "url": "./index.html#cari"
+    },
+    {
+      "name": "Pesanan saya",
+      "url": "./index.html#akun"
+    }
+  ]
+}
