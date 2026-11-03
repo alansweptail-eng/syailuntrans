@@ -7,7 +7,8 @@
 create extension if not exists "pgcrypto";
 
 -- Profil pengguna (terhubung ke auth.users) dan perannya
-create type user_role as enum ('pelanggan', 'mitra', 'operasional', 'admin');
+-- 'admin' = gabungan pengelola armada & operasional; 'superadmin' = kendali penuh platform
+create type user_role as enum ('pelanggan', 'mitra', 'admin', 'superadmin');
 create type verif_status as enum ('belum', 'menunggu', 'terverifikasi', 'ditolak');
 
 create table profiles (
@@ -190,6 +191,7 @@ create table settings (
   id int primary key default 1 check (id = 1),
   nama_usaha text not null default 'Syailun Trans',
   wa_admin text, alamat text, jam_operasional text,
+  maps_url text, lat double precision, lng double precision,
   biaya_sopir int not null default 150000, biaya_antar int not null default 50000, biaya_jemput int not null default 50000,
   deposit_motor int not null default 300000, deposit_mobil int not null default 1000000,
   perlindungan_motor int not null default 15000, perlindungan_mobil int not null default 50000,
@@ -229,21 +231,21 @@ alter table categories enable row level security;
 
 create or replace function my_role() returns user_role language sql stable as $$ select role from profiles where id = auth.uid() $$;
 
-create policy "profil sendiri" on profiles for all using (id = auth.uid() or my_role() in ('admin','operasional'));
+create policy "profil sendiri" on profiles for all using (id = auth.uid() or my_role() in ('admin','superadmin'));
 create policy "kendaraan publik terbaca" on vehicles for select using (
-  (status = 'disetujui' and aktif) or my_role() in ('admin','operasional')
+  (status = 'disetujui' and aktif) or my_role() in ('admin','superadmin')
   or partner_id in (select id from partners where owner_id = auth.uid()));
 create policy "mitra kelola kendaraannya" on vehicles for all using (
-  partner_id in (select id from partners where owner_id = auth.uid()) or my_role() = 'admin');
-create policy "mitra aktif terbaca" on partners for select using (status = 'aktif' or owner_id = auth.uid() or my_role() = 'admin');
-create policy "admin kelola mitra" on partners for all using (my_role() = 'admin' or owner_id = auth.uid());
+  partner_id in (select id from partners where owner_id = auth.uid()) or my_role() = 'superadmin');
+create policy "mitra aktif terbaca" on partners for select using (status = 'aktif' or owner_id = auth.uid() or my_role() = 'superadmin');
+create policy "admin kelola mitra" on partners for all using (my_role() = 'superadmin' or owner_id = auth.uid());
 create policy "pesanan milik sendiri" on bookings for select using (
-  customer_id = auth.uid() or my_role() in ('admin','operasional')
+  customer_id = auth.uid() or my_role() in ('admin','superadmin')
   or vehicle_id in (select v.id from vehicles v join partners p on p.id = v.partner_id where p.owner_id = auth.uid()));
 create policy "pelanggan membuat pesanan" on bookings for insert with check (customer_id = auth.uid());
-create policy "operasional ubah pesanan" on bookings for update using (my_role() in ('admin','operasional'));
+create policy "operasional ubah pesanan" on bookings for update using (my_role() in ('admin','superadmin'));
 create policy "kategori terbaca" on categories for select using (true);
-create policy "promo aktif terbaca" on promos for select using (aktif or my_role() = 'admin');
+create policy "promo aktif terbaca" on promos for select using (aktif or my_role() = 'superadmin');
 create policy "ulasan terbaca" on reviews for select using (true);
 
 -- Storage: buat bucket 'vehicle-photos' (publik baca) dan 'customer-docs' (privat) lewat dashboard Supabase.

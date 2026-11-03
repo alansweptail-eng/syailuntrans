@@ -921,6 +921,34 @@ html.app #results .vc[data-art] .ph{aspect-ratio:var(--ar);flex:none;width:100%;
 .hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(6,28,36,.55) 0%,rgba(6,28,36,.25) 32%,rgba(6,28,36,0) 55%)}
 .ah-show.spot img{-webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.5) 10%,#000 24%,#000 56%,rgba(0,0,0,.55) 74%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.5) 10%,#000 24%,#000 56%,rgba(0,0,0,.55) 74%,transparent 100%)}
 
+/* ===================== PETA LOKASI GARASI ===================== */
+.mapcard{display:grid;grid-template-columns:1.5fr 1fr;border-radius:28px;overflow:hidden;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.mapbox{position:relative;min-height:340px;background:#DDE9EC}
+.mapbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.mapinfo{padding:30px;display:flex;flex-direction:column;gap:8px;justify-content:center}
+.mapinfo h3{font-family:var(--serif);font-size:1.8rem;font-weight:600}
+.mapinfo p{color:var(--ink-2)}
+.mapcard.compact{grid-template-columns:1fr}
+.mapcard.compact .mapbox{min-height:200px}
+.mapcard.compact .mapinfo{padding:18px}
+.mapcard.compact .mapinfo h3{font-size:1.35rem}
+@media (max-width:860px){.mapcard{grid-template-columns:1fr}.mapbox{min-height:230px}.mapinfo{padding:20px}}
+/* Peta ilustrasi (dipakai bila peta Google tidak bisa disematkan) */
+.map-fake{position:absolute;inset:0;display:block;text-decoration:none;color:#0F2F38;overflow:hidden;
+  background:radial-gradient(circle at 30% 70%,rgba(20,184,166,.18) 0 18%,transparent 19%),radial-gradient(circle at 78% 22%,rgba(59,183,245,.16) 0 14%,transparent 15%),
+  repeating-linear-gradient(0deg,transparent 0 46px,rgba(255,255,255,.75) 46px 49px),repeating-linear-gradient(90deg,transparent 0 58px,rgba(255,255,255,.75) 58px 61px),#E2ECEE}
+.mf-road{position:absolute;background:#fff;box-shadow:0 0 0 1px rgba(15,47,56,.06)}
+.mf-road.r1{left:-10%;right:-10%;top:52%;height:14px;transform:rotate(-8deg);background:#F7E7B8}
+.mf-road.r2{top:-10%;bottom:-10%;left:58%;width:11px;transform:rotate(12deg)}
+.mf-road.r3{top:-10%;bottom:-10%;left:24%;width:8px;transform:rotate(-20deg)}
+.mf-pin{position:absolute;left:50%;top:44%;transform:translate(-50%,-100%);width:54px;height:54px;border-radius:50% 50% 50% 0;rotate:-45deg;background:var(--ig-btn);display:grid;place-items:center;color:#fff;box-shadow:0 10px 24px -8px rgba(14,110,130,.7)}
+.mf-pin svg{rotate:45deg}
+.mf-pin::after{content:"";position:absolute;width:120px;height:120px;left:50%;top:50%;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(20,184,166,.5);rotate:45deg;animation:mfp 2.4s ease-out infinite}
+@keyframes mfp{from{transform:scale(.4);opacity:1}to{transform:scale(1.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.mf-pin::after{animation:none}}
+.mf-lbl{position:absolute;left:50%;top:calc(44% + 14px);transform:translateX(-50%);background:#fff;padding:7px 14px;border-radius:999px;font-weight:700;font-size:.86rem;white-space:nowrap;box-shadow:0 6px 18px -8px rgba(15,47,56,.4)}
+.mf-hint{position:absolute;right:12px;bottom:12px;font-size:.74rem;font-weight:600;background:rgba(255,255,255,.85);padding:5px 10px;border-radius:999px}
+
 </style>
 </head>
 <body>
@@ -1089,7 +1117,7 @@ function seed(){
   const s = {
     v:1,
     settings:{
-      nama:'Syailun Trans', wa:'6287877651337', email:'', alamat:'Alamat garasi belum diisi', jam:'Setiap hari, 07.00–21.00',
+      nama:'Syailun Trans', wa:'6287877651337', email:'', alamat:'Jl Mayang RT 03/02 Dk. Kewangen, Desa Karangsari, Kecamatan Kebumen', maps:'https://maps.app.goo.gl/sdzRVMSSVnyJeXbg7', lat:-7.6579137, lng:109.6640152, jam:'Setiap hari, 07.00–21.00',
       sopir:150000, antar:50000, jemput:50000, depositMotor:300000, depositMobil:1000000,
       perlindunganMotor:15000, perlindunganMobil:50000, lebihJamMotor:10000, lebihJamMobil:50000, komisi:10,
       syarat:['KTP asli penyewa (dititipkan selama masa sewa)','SIM C untuk motor, SIM A untuk mobil lepas kunci','Kartu identitas pendukung: KK, kartu pelajar/kerja, atau NPWP','Deposit dibayar saat serah terima dan dikembalikan setelah kendaraan diperiksa','Bahan bakar dikembalikan seperti saat diambil'],
@@ -1098,7 +1126,7 @@ function seed(){
     cats: DEFAULT_CATS.map(c => ({...c})),
     vehicles: seedVehicles(),
     partners:[
-      {id:'p1', nama:'Syailun Trans', pemilik:'Admin Syailun Trans', hp:'6287877651337', kota:'Belum diisi', status:'aktif', komisi:0, utama:true, dibuat:new Date().toISOString()},
+      {id:'p1', nama:'Syailun Trans', pemilik:'Admin Syailun Trans', hp:'6287877651337', kota:'Kebumen', status:'aktif', komisi:0, utama:true, dibuat:new Date().toISOString()},
       {id:'p2', nama:'Contoh Mitra Rental', pemilik:'Pemilik Contoh', hp:'081200000001', kota:'Contoh kota', status:'menunggu', komisi:10, contoh:true, dibuat:new Date().toISOString()}
     ],
     bookings: seedBookings(),
@@ -1117,7 +1145,9 @@ function load(){
   if(!S || S.v !== 1) S = seed();
   /* Migrasi: ganti nomor WhatsApp contoh dengan nomor admin asli */
   if(S.settings.wa === '6281200000000') S.settings.wa = '6287877651337';
-  S.partners.forEach(p => { if(p.utama && p.hp === '6281200000000') p.hp = '6287877651337'; });
+  S.partners.forEach(p => { if(p.utama && p.hp === '6281200000000') p.hp = '6287877651337'; if(p.utama && p.kota === 'Belum diisi') p.kota = 'Kebumen'; });
+  if(S.settings.alamat === 'Alamat garasi belum diisi') S.settings.alamat = 'Jl Mayang RT 03/02 Dk. Kewangen, Desa Karangsari, Kecamatan Kebumen';
+  if(!S.settings.maps) Object.assign(S.settings, {maps:'https://maps.app.goo.gl/sdzRVMSSVnyJeXbg7', lat:-7.6579137, lng:109.6640152});
 }
 let saveFailed = false;
 function save(){
@@ -1261,7 +1291,7 @@ function render(){
   const [base, ...rest] = h.split('-'); const arg = rest.join('-');
   const fn = ROUTES[base] || ROUTES.notfound;
   document.body.className = '';
-  const isBiz = ['mitra', 'operasional', 'admin'].includes(base);
+  const isBiz = ['mitra', 'operasional', 'admin', 'superadmin'].includes(base);
   $('#app').innerHTML = fn(arg) || '';
   if(fn.after) fn.after(arg);
   renderChrome(base, isBiz);
@@ -1275,7 +1305,7 @@ addEventListener('hashchange', render);
 function renderChrome(base, isBiz){
   const navOn = k => (k === base ? ' class="on" aria-current="page"' : '');
   const fav = S.favorit.length, act = S.bookings.filter(b => myBooking(b) && LOCK.includes(b.status)).length;
-  const bizName = {mitra:'Portal Mitra', operasional:'Operasional', admin:'Super Admin'}[base];
+  const bizName = {admin:'Admin', superadmin:'Super Admin'}[base];
   $('#top').innerHTML = `<div class="wrap">
     <a class="brand" href="#beranda"><span class="brand-mark">${ic('mark', 20)}</span>SYAILUN TRANS</a>
     ${isBiz ? `<span class="badge gold hide-m">${bizName}</span>` : `<nav class="nav" aria-label="Navigasi utama">
@@ -1297,14 +1327,14 @@ function renderChrome(base, isBiz){
   $('#foot').innerHTML = `<div class="wrap"><div class="fgrid">
     <div><a class="brand" href="#beranda" style="margin-bottom:12px"><span class="brand-mark">${ic('mark', 20)}</span>SYAILUN TRANS</a><p class="muted" style="font-size:.92rem;max-width:34ch">Sewa motor, mobil, dan minibus. Lepas kunci atau dengan sopir.</p></div>
     <div><h4>Pelanggan</h4><a href="#cari">Cari kendaraan</a><a href="#akun" data-tab="pesanan">Pesanan saya</a><a href="#akun" data-tab="favorit">Favorit</a><a href="#bantuan">Bantuan</a></div>
-    <div><h4>Bisnis</h4><a href="#mitra">Portal mitra</a><a href="#operasional">Operasional</a><a href="#admin">Super admin</a></div>
-    <div><h4>Kontak</h4><a href="${waLink(s.wa, 'Halo ' + s.nama)}" target="_blank" rel="noopener">WhatsApp admin</a><p class="muted" style="font-size:.92rem;padding:4px 0">${esc(s.alamat)}</p><p class="muted" style="font-size:.92rem">${esc(s.jam)}</p></div>
+    <div><h4>Bisnis</h4><a href="#admin">Admin</a><a href="#superadmin">Super Admin</a></div>
+    <div><h4>Kontak</h4><a href="${waLink(s.wa, 'Halo ' + s.nama)}" target="_blank" rel="noopener">WhatsApp admin</a><a href="${esc(s.maps || '#')}" target="_blank" rel="noopener">${esc(s.alamat)}</a><p class="muted" style="font-size:.92rem">${esc(s.jam)}</p></div>
   </div><p class="muted" style="font-size:.84rem;margin-top:28px">© ${new Date().getFullYear()} ${esc(s.nama)}. Prototipe dalam mode demo.</p></div>`;
   $('#foot').hidden = isBiz;
   $('#roleBtn').onclick = openPortals;
 }
 function openPortals(){ modal('Masuk ke portal', `<p class="muted" style="margin-bottom:16px">Mode demo: belum ada login. Pilih tampilan yang ingin dicoba. Pada versi produksi, setiap portal memerlukan akun dengan hak akses berbeda.</p>
-    <div class="stack">${[['beranda','user','Pelanggan','Cari, pesan, dan kelola sewa'],['mitra','store','Portal Mitra','Pemilik kendaraan dan usaha rental'],['operasional','clip','Operasional','Serah terima, jadwal, deposit, perawatan'],['admin','layout','Super Admin','Kelola seluruh platform']].map(r => `<a class="choice" href="#${r[0]}" data-close style="text-decoration:none"><span class="cat ci" style="padding:0;border:0;background:none">${ic(r[1], 22)}</span><span><b>${r[2]}</b><small>${r[3]}</small></span>${ic('chevR', 18, 'style="margin-left:auto;align-self:center"')}</a>`).join('')}</div>`); }
+    <div class="stack">${[['beranda','user','Pelanggan','Cari, pesan, dan kelola sewa'],['admin','clip','Admin','Armada, harga, reservasi, serah terima, perawatan, pendapatan'],['superadmin','layout','Super Admin','Kendali penuh: mitra, komisi, promo, pengaturan sistem']].map(r => `<a class="choice" href="#${r[0]}" data-close style="text-decoration:none"><span class="cat ci" style="padding:0;border:0;background:none">${ic(r[1], 22)}</span><span><b>${r[2]}</b><small>${r[3]}</small></span>${ic('chevR', 18, 'style="margin-left:auto;align-self:center"')}</a>`).join('')}</div>`); }
 document.addEventListener('click', e => { const a = e.target.closest('a[data-tab]'); if(a) S.ui.akunTab = a.dataset.tab; });
 const myBooking = b => !!b.milikSaya;
 
@@ -1433,6 +1463,10 @@ ROUTES.beranda = () => {
     ${revs.length ? `<div class="trust">${revs.map(r => `<div><span class="stars">${Array.from({length:r.bintang}, () => ic('star', 16, 'fill="currentColor"')).join('')}</span><p style="color:var(--ink);margin:10px 0">“${esc(r.teks)}”</p><b style="font-size:.9rem">${esc(r.nama)}</b><p>${esc((veh(r.vid) || {}).nama || '')}</p></div>`).join('')}</div>`
       : `<div class="card">${emptyState('star', 'Belum ada ulasan', 'Ulasan dari pelanggan akan tampil di sini setelah sewa pertama selesai.')}</div>`}
   </div></section>
+
+  <section class="sec" style="padding-top:8px"><div class="wrap">
+    <div class="sec-head"><div><h2>Kunjungi garasi kami</h2><p class="muted">Ambil kendaraan langsung di garasi, atau minta diantar ke alamat Anda.</p></div></div>
+    ${mapCard()}</div></section>
 
   <section class="sec" style="padding-top:8px"><div class="wrap two">
     <div><h2 style="margin-bottom:10px">Pertanyaan umum</h2>${faqHTML().slice(0, 4).join('')}<button class="link" data-go="bantuan" style="margin-top:16px">Lihat semua pertanyaan</button></div>
@@ -1601,7 +1635,7 @@ ROUTES.kendaraan = id => {
             <tr><td>Bahan bakar, tol, dan parkir</td><td>Ditanggung penyewa</td></tr>
           </tbody></table></div>
         <div><h3 style="margin-bottom:10px">Syarat sewa</h3><ul style="margin:0;padding-left:20px;color:var(--ink-2)">${s.syarat.map(x => `<li style="margin-bottom:6px">${esc(x)}</li>`).join('')}</ul></div>
-        <div class="card pad row" style="gap:16px"><span class="brand-mark" style="width:48px;height:48px;border-radius:14px">${ic('store', 22)}</span><div><p class="muted" style="font-size:.84rem">Disediakan oleh</p><b>${esc(p.nama)}</b><p class="muted" style="font-size:.88rem">${esc(p.kota)}${p.status === 'aktif' ? ', mitra terverifikasi' : ''}</p></div></div>
+        <div class="card pad row" style="gap:16px"><span class="brand-mark" style="width:48px;height:48px;border-radius:14px">${ic('store', 22)}</span><div><p class="muted" style="font-size:.84rem">Disediakan oleh</p><b>${esc(p.nama)}</b><p class="muted" style="font-size:.88rem">${esc(p.kota)}${p.status === 'aktif' ? ', mitra terverifikasi' : ''}</p>${p.utama ? `<a class="link" style="font-size:.88rem" href="${esc(S.settings.maps)}" target="_blank" rel="noopener">${esc(S.settings.alamat)}</a>` : ''}</div></div>
         <div><h3 style="margin-bottom:12px">Ulasan</h3>${revs.length ? revs.map(r => `<div class="card pad" style="margin-bottom:10px"><span class="stars">${Array.from({length:r.bintang}, () => ic('star', 15, 'fill="currentColor"')).join('')}</span><p style="margin:8px 0">${esc(r.teks)}</p><small class="muted">${esc(r.nama)}, ${fmtD(r.t.slice(0, 10))}</small></div>`).join('') : `<div class="card">${emptyState('star', 'Belum ada ulasan', 'Jadilah yang pertama memberi ulasan setelah menyewa kendaraan ini.')}</div>`}</div>
       </div>
       <aside class="dside">
@@ -1707,6 +1741,7 @@ function stepJadwal(){
     <div><h3 style="margin-bottom:12px">Lokasi pengambilan</h3><div class="stack" style="gap:10px">
       <label class="choice"><input type="radio" name="ambil" value="garasi" ${BK.ambil.tipe === 'garasi' ? 'checked' : ''}><span><b>Ambil di garasi</b><small>${esc(s.alamat)}</small></span><span class="price">Gratis</span></label>
       ${v.paket.antar ? `<label class="choice"><input type="radio" name="ambil" value="antar" ${BK.ambil.tipe === 'antar' ? 'checked' : ''}><span><b>Diantar ke alamat saya</b><small>Kendaraan diantar sesuai jam ambil</small></span><span class="price">${rp(s.antar)}</span></label>` : ''}
+      <a class="link" href="${esc(s.maps)}" target="_blank" rel="noopener" style="font-size:.9rem;justify-self:start">${ic('pin', 15)} Lihat lokasi garasi di Google Maps</a>
       <div class="fi" id="ambilAlamat" ${BK.ambil.tipe === 'antar' ? '' : 'hidden'}><label class="l" for="aAlamat">Alamat pengantaran</label><input class="field" id="aAlamat" value="${esc(BK.ambil.alamat)}" placeholder="Nama jalan, nomor rumah, patokan"></div>
     </div></div>
     <div><h3 style="margin-bottom:12px">Lokasi pengembalian</h3><div class="stack" style="gap:10px">
@@ -2031,6 +2066,7 @@ ROUTES.bantuan = () => {
       ${card('wallet', 'Pembayaran & pembatalan', esc(s.batal), `<button class="btn btn-secondary btn-sm" data-go="akun">Buka Pesanan saya</button>`)}
       ${card('siren', 'Darurat di jalan', 'Kecelakaan atau keadaan darurat: hubungi 112, lalu kabari admin.', `<div class="row"><a class="btn btn-danger btn-sm" href="tel:112">${ic('phone', 16)}Telepon 112</a><a class="btn btn-secondary btn-sm" href="${waLink(s.wa, 'DARURAT: saya mengalami kendala di jalan. Kode pesanan: ')}" target="_blank" rel="noopener">Kabari admin</a></div>`)}
     </div>
+    <div style="margin-bottom:28px">${mapCard()}</div>
     <div class="two" style="align-items:start">
       <div><h3 style="margin-bottom:6px;font-size:1.4rem">Pertanyaan umum</h3>${faqHTML().join('')}</div>
       <form class="card pad stack" id="tiket"><h3>Kirim pertanyaan</h3><p class="muted" style="font-size:.92rem">Admin akan membalas ke nomor WhatsApp Anda.</p>
@@ -2123,6 +2159,18 @@ function buildArt(src){
 }
 const prepArt = () => Promise.all([...new Set(S.vehicles.map(photo).filter(Boolean))].map(buildArt));
 
+/* ===== Peta lokasi garasi ===== */
+function mapCard(opt = {}){
+  const s = S.settings, dir = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`;
+  const canEmbed = location.protocol === 'https:' && !/claude/.test(location.hostname);
+  const frame = canEmbed
+    ? `<iframe title="Peta lokasi ${esc(s.nama)}" src="https://maps.google.com/maps?q=${s.lat},${s.lng}&z=17&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`
+    : `<a class="map-fake" href="${esc(s.maps)}" target="_blank" rel="noopener" aria-label="Buka lokasi ${esc(s.nama)} di Google Maps"><span class="mf-road r1"></span><span class="mf-road r2"></span><span class="mf-road r3"></span><span class="mf-pin">${ic('pin', 30)}</span><span class="mf-lbl">${esc(s.nama)}</span><span class="mf-hint">Ketuk untuk membuka peta</span></a>`;
+  return `<div class="mapcard${opt.compact ? ' compact' : ''}"><div class="mapbox">${frame}</div>
+    <div class="mapinfo"><p class="eyebrow">Lokasi garasi</p><h3>${esc(s.nama)}</h3><p>${esc(s.alamat)}</p><p class="muted">${esc(s.jam)}</p>
+      <div class="row" style="margin-top:6px"><a class="btn btn-primary btn-sm" href="${dir}" target="_blank" rel="noopener">${ic('pin', 16)}Petunjuk arah</a><a class="btn btn-secondary btn-sm" href="${esc(s.maps)}" target="_blank" rel="noopener">Buka di Google Maps</a></div></div></div>`;
+}
+
 /* ===== Mode aplikasi (HP) vs website (desktop) ===== */
 const MQ = matchMedia('(max-width: 860px)');
 let APP = MQ.matches;
@@ -2191,6 +2239,7 @@ function appHome(){
     ${prestigeList(pub).length > 1 ? `<section><div class="ahh"><h3>Koleksi prestise</h3><a href="#cari">Lihat semua</a></div><div class="hscroll">${prestigeList(pub).map(v => pcard(v, false)).join('')}</div></section>` : ''}
     ${feat.length ? `<section><div class="ahh"><h3>Kendaraan unggulan</h3><a href="#cari">Lihat semua</a></div><div class="hscroll">${feat.map(miniCard).join('')}</div></section>` : ''}
     <section><div class="ahh"><h3>Paling sering dipesan</h3><a href="#cari">Lihat semua</a></div><div class="hscroll">${pop.map(miniCard).join('')}</div></section>
+    <section><div class="ahh"><h3>Lokasi garasi</h3></div>${mapCard({compact:true})}</section>
     <section><div class="ahh"><h3>Butuh bantuan?</h3></div><div class="menu-list">
       <a href="${waLink(s.wa, 'Halo ' + s.nama + ', saya butuh bantuan memilih kendaraan.')}" target="_blank" rel="noopener">${ic('wa', 20)}Chat admin lewat WhatsApp${ic('chevR', 18)}</a>
       <a href="#bantuan">${ic('help', 20)}Pertanyaan umum${ic('chevR', 18)}</a>
@@ -2583,7 +2632,7 @@ ROUTES.admin = () => {
         emptyState('wallet', 'Belum ada transaksi', 'Transaksi akan muncul setelah pelanggan memesan.'));
   }
   if(tab === 'mitra'){
-    body = head('Mitra rental', 'Setujui pendaftaran dan atur komisi per mitra.') + tbl(['Usaha', 'Pemilik', 'Kota', '#Kendaraan', 'Komisi %', 'Status', ''], S.partners.map(p => `<tr><td><b>${esc(p.nama)}</b>${p.utama ? '<br><small class="muted">pemilik platform</small>' : p.contoh ? '<br><small class="muted">contoh</small>' : ''}</td><td>${esc(p.pemilik)}<br><small class="muted">${esc(p.hp)}</small></td><td>${esc(p.kota)}</td><td class="num">${S.vehicles.filter(v => v.mitra === p.id).length}</td>
+    body = head('Mitra rental', 'Tambah mitra, setujui pendaftaran, dan atur komisi per mitra.', '<button class="btn btn-primary" id="addP">' + ic('plus', 18) + 'Tambah mitra</button>') + tbl(['Usaha', 'Pemilik', 'Kota', '#Kendaraan', 'Komisi %', 'Status', ''], S.partners.map(p => `<tr><td><b>${esc(p.nama)}</b>${p.utama ? '<br><small class="muted">pemilik platform</small>' : p.contoh ? '<br><small class="muted">contoh</small>' : ''}</td><td>${esc(p.pemilik)}<br><small class="muted">${esc(p.hp)}</small></td><td>${esc(p.kota)}</td><td class="num">${S.vehicles.filter(v => v.mitra === p.id).length}</td>
       <td><input class="field" type="number" min="0" max="50" value="${p.komisi}" data-kom="${p.id}" style="width:80px" aria-label="Komisi ${esc(p.nama)}"></td>
       <td>${{aktif:'<span class="badge ok">Aktif</span>', menunggu:'<span class="badge warn">Menunggu</span>', ditolak:'<span class="badge err">Ditolak</span>', nonaktif:'<span class="badge">Nonaktif</span>'}[p.status]}</td>
       <td><div class="row" style="flex-wrap:nowrap">${p.status === 'menunggu' ? `<button class="btn btn-primary btn-sm" data-pst="${p.id}:aktif">Setujui</button><button class="btn btn-ghost btn-sm" data-pst="${p.id}:ditolak">Tolak</button>` : p.utama ? '' : p.status === 'aktif' ? `<button class="btn btn-secondary btn-sm" data-pst="${p.id}:nonaktif">Nonaktifkan</button>` : `<button class="btn btn-secondary btn-sm" data-pst="${p.id}:aktif">Aktifkan</button>`}</div></td></tr>`), '');
@@ -2620,7 +2669,8 @@ ROUTES.admin = () => {
     const s = S.settings, n = (id, l, v, step = 5000) => `<div class="fi"><label class="l" for="${id}">${l}</label><input class="field" type="number" min="0" step="${step}" id="${id}" value="${v}"></div>`;
     body = head('Pengaturan sistem', 'Berlaku untuk seluruh pesanan baru.') + `<form class="stack" id="setForm" style="max-width:860px">
       <div class="card pad stack"><h3>Usaha</h3><div class="grid2"><div class="fi"><label class="l" for="sNama">Nama usaha</label><input class="field" id="sNama" value="${esc(s.nama)}"></div><div class="fi"><label class="l" for="sWa">Nomor WhatsApp admin (format 62…)</label><input class="field" id="sWa" value="${esc(s.wa)}" inputmode="numeric"></div></div>
-        <div class="fi"><label class="l" for="sAlamat">Alamat garasi</label><input class="field" id="sAlamat" value="${esc(s.alamat)}"></div><div class="fi"><label class="l" for="sJam">Jam operasional</label><input class="field" id="sJam" value="${esc(s.jam)}"></div></div>
+        <div class="fi"><label class="l" for="sAlamat">Alamat garasi</label><input class="field" id="sAlamat" value="${esc(s.alamat)}"></div><div class="fi"><label class="l" for="sJam">Jam operasional</label><input class="field" id="sJam" value="${esc(s.jam)}"></div>
+        <div class="grid3"><div class="fi" style="grid-column:span 1"><label class="l" for="sMaps">Tautan Google Maps</label><input class="field" id="sMaps" value="${esc(s.maps || '')}"></div><div class="fi"><label class="l" for="sLat">Lintang (latitude)</label><input class="field" id="sLat" value="${s.lat ?? ''}"></div><div class="fi"><label class="l" for="sLng">Bujur (longitude)</label><input class="field" id="sLng" value="${s.lng ?? ''}"></div></div></div>
       <div class="card pad stack"><h3>Biaya</h3><div class="grid3">${n('sSopir', 'Sopir per hari', s.sopir)}${n('sAntar', 'Antar ke alamat', s.antar)}${n('sJemput', 'Jemput dari alamat', s.jemput)}${n('sDepM', 'Deposit motor', s.depositMotor, 50000)}${n('sDepC', 'Deposit mobil', s.depositMobil, 50000)}${n('sKom', 'Komisi default (%)', s.komisi, 1)}${n('sPerM', 'Perlindungan motor / hari', s.perlindunganMotor, 1000)}${n('sPerC', 'Perlindungan mobil / hari', s.perlindunganMobil, 1000)}<div></div>${n('sLbM', 'Kelebihan waktu motor / jam', s.lebihJamMotor, 1000)}${n('sLbC', 'Kelebihan waktu mobil / jam', s.lebihJamMobil, 1000)}</div></div>
       <div class="card pad stack"><h3>Ketentuan</h3><div class="fi"><label class="l" for="sSyarat">Syarat sewa (satu baris satu syarat)</label><textarea class="field" id="sSyarat" rows="6">${esc(s.syarat.join('\n'))}</textarea></div><div class="fi"><label class="l" for="sBatal">Kebijakan pembatalan</label><textarea class="field" id="sBatal">${esc(s.batal)}</textarea></div></div>
       <button class="btn btn-primary" type="submit" style="justify-self:start">Simpan pengaturan</button></form>`;
@@ -2637,6 +2687,18 @@ ROUTES.admin.after = () => {
   bindBizTabs('admin');
   const af = $('#admF'); if(af) af.onchange = () => { S.ui.admF = af.value; render(); };
   $$('[data-kom]').forEach(i => i.onchange = () => { const n = +i.value; if(!(n >= 0 && n <= 50)){ toast('Komisi 0–50%', 'err'); return; } partner(i.dataset.kom).komisi = n; save(); toast('Komisi diperbarui'); });
+  const ap = $('#addP'); if(ap) ap.onclick = () => {
+    modal('Tambah mitra', `<form class="stack" id="regForm2" novalidate><div class="fi"><label class="l" for="rNama">Nama usaha rental</label><input class="field" id="rNama"></div>
+      <div class="grid2"><div class="fi"><label class="l" for="rPem">Nama pemilik</label><input class="field" id="rPem"></div><div class="fi"><label class="l" for="rHp">Nomor WhatsApp</label><input class="field" id="rHp" inputmode="tel"></div></div>
+      <div class="grid2"><div class="fi"><label class="l" for="rKota">Kota</label><input class="field" id="rKota"></div><div class="fi"><label class="l" for="rKom">Komisi (%)</label><input class="field" id="rKom" type="number" min="0" max="50" value="${S.settings.komisi}"></div></div></form>`,
+      `<button class="btn btn-secondary" data-close>Batal</button><button class="btn btn-primary" id="rSave">Simpan mitra</button>`);
+    $('#rSave').onclick = () => {
+      const n = $('#rNama').value.trim(), pm = $('#rPem').value.trim(), h = $('#rHp').value.trim(), k = $('#rKota').value.trim(), km = +$('#rKom').value;
+      const ok = [fieldErr($('#rNama'), n.length < 3 ? 'Isi nama usaha.' : ''), fieldErr($('#rPem'), pm.length < 3 ? 'Isi nama pemilik.' : ''), fieldErr($('#rHp'), !validHp(h) ? 'Isi nomor WhatsApp yang aktif.' : ''), fieldErr($('#rKota'), k.length < 3 ? 'Isi kota.' : ''), fieldErr($('#rKom'), !(km >= 0 && km <= 50) ? 'Komisi 0–50%.' : '')].every(Boolean);
+      if(!ok) return;
+      S.partners.push({id:uid('P'), nama:n, pemilik:pm, hp:h, kota:k, status:'aktif', komisi:km, dibuat:new Date().toISOString()}); save(); closeModal(); toast('Mitra ditambahkan'); render();
+    };
+  };
   $$('[data-pst]').forEach(b => b.onclick = () => { const [id, st] = b.dataset.pst.split(':'); partner(id).status = st; save(); toast('Status mitra diperbarui'); render(); });
   $$('[data-vst]').forEach(b => b.onclick = () => { const [id, st] = b.dataset.vst.split(':'); veh(id).status = st; save(); toast(st === 'disetujui' ? 'Kendaraan disetujui' : 'Kendaraan ditolak'); render(); });
   $$('[data-ung]').forEach(i => i.onchange = () => { veh(i.dataset.ung).unggulan = i.checked; save(); toast('Kendaraan unggulan diperbarui'); });
@@ -2657,11 +2719,39 @@ ROUTES.admin.after = () => {
     if(!fieldErr($('#sWa'), !/^62\d{8,13}$/.test(wa) ? 'Nomor WhatsApp belum valid.' : '')) return;
     const g = id => +$('#' + id).value || 0;
     Object.assign(S.settings, {nama:$('#sNama').value.trim() || 'Syailun Trans', wa, alamat:$('#sAlamat').value.trim(), jam:$('#sJam').value.trim(), sopir:g('sSopir'), antar:g('sAntar'), jemput:g('sJemput'), depositMotor:g('sDepM'), depositMobil:g('sDepC'), komisi:g('sKom'), perlindunganMotor:g('sPerM'), perlindunganMobil:g('sPerC'), lebihJamMotor:g('sLbM'), lebihJamMobil:g('sLbC'),
-      syarat:$('#sSyarat').value.split('\n').map(x => x.trim()).filter(Boolean), batal:$('#sBatal').value.trim()});
+      syarat:$('#sSyarat').value.split('\n').map(x => x.trim()).filter(Boolean), batal:$('#sBatal').value.trim(),
+      maps:$('#sMaps').value.trim(), lat:parseFloat($('#sLat').value) || S.settings.lat, lng:parseFloat($('#sLng').value) || S.settings.lng});
     const p1 = S.partners.find(p => p.utama); if(p1){ p1.nama = S.settings.nama; p1.hp = wa; }
     save(); toast('Pengaturan disimpan'); render(); };
   const rd = $('#resetDemo'); if(rd) rd.onclick = () => confirmBox('Atur ulang data demo?', 'Semua perubahan di perangkat ini akan hilang.', 'Atur ulang', () => { S = seed(); save(); BK = null; toast('Data demo dipulihkan'); render(); }, true);
 };
+
+/* ===== Pintu masuk: Super Admin & Admin ===== */
+ROUTES.superadmin = ROUTES.admin;
+const MITRA_VIEW = ROUTES.mitra, OPS_VIEW = ROUTES.operasional;
+const ADMIN_TABS = [
+  ['hariini', 'layout', 'Hari ini', 'ops', 'ringkasan'], ['reservasi', 'ticket', 'Reservasi', 'ops', 'reservasi'],
+  ['kendaraan', 'car', 'Kendaraan', 'mitra', 'kendaraan'], ['kalender', 'calendar', 'Kalender', 'mitra', 'kalender'],
+  ['armada', 'clip', 'Status armada', 'ops', 'armada'], ['perawatan', 'wrench', 'Perawatan', 'ops', 'perawatan'],
+  ['verifikasi', 'idcard', 'Verifikasi pelanggan', 'ops', 'verifikasi'], ['usaha', 'chart', 'Ringkasan usaha', 'mitra', 'ringkasan'],
+  ['pendapatan', 'wallet', 'Pendapatan', 'mitra', 'pendapatan'], ['laporan', 'chart', 'Laporan', 'ops', 'laporan'], ['profil', 'store', 'Profil usaha', 'mitra', 'profil']];
+ROUTES.admin = () => {
+  const tab = ADMIN_TABS.find(t => t[0] === S.ui.adminGabungTab) || ADMIN_TABS[0];
+  let html;
+  if(tab[3] === 'ops'){ S.ui.operasionalTab = tab[4]; html = OPS_VIEW(); } else { S.ui.mitraTab = tab[4]; html = MITRA_VIEW(); }
+  const i = html.indexOf('<main class="bmain">'), j = html.lastIndexOf('</main>');
+  const body = html.slice(i + '<main class="bmain">'.length, j);
+  const pend = S.bookings.filter(b => b.status === 'menunggu-bayar' || b.status === 'menunggu-penawaran').length, ver = S.profile.verifikasi === 'menunggu' ? 1 : 0;
+  const items = ADMIN_TABS.map(t => [t[0], t[1], t[2], t[0] === 'reservasi' ? pend : t[0] === 'verifikasi' ? ver : 0]);
+  return bizLayout('admin', S.settings.nama, 'Admin', items, tab[0], body);
+};
+ROUTES.admin.after = () => {
+  const tab = ADMIN_TABS.find(t => t[0] === S.ui.adminGabungTab) || ADMIN_TABS[0];
+  (tab[3] === 'ops' ? OPS_VIEW : MITRA_VIEW).after();
+  $$('[data-btab]').forEach(b => b.onclick = () => { S.ui.adminGabungTab = b.dataset.btab; save(); render(); });
+};
+ROUTES.mitra = () => { setTimeout(() => go('admin'), 0); return ''; };
+ROUTES.operasional = () => { setTimeout(() => go('admin'), 0); return ''; };
 
 /* ===== Mulai ===== */
 if('serviceWorker' in navigator && location.protocol === 'https:'){ navigator.serviceWorker.register('sw.js').catch(() => {}); }
