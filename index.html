@@ -948,6 +948,9 @@ html.app #results .vc[data-art] .ph{aspect-ratio:var(--ar);flex:none;width:100%;
 @media (prefers-reduced-motion:reduce){.mf-pin::after{animation:none}}
 .mf-lbl{position:absolute;left:50%;top:calc(44% + 14px);transform:translateX(-50%);background:#fff;padding:7px 14px;border-radius:999px;font-weight:700;font-size:.86rem;white-space:nowrap;box-shadow:0 6px 18px -8px rgba(15,47,56,.4)}
 .mf-hint{position:absolute;right:12px;bottom:12px;font-size:.74rem;font-weight:600;background:rgba(255,255,255,.85);padding:5px 10px;border-radius:999px}
+.pesanan-btn{position:relative}
+.pesanan-btn .count{top:-7px;right:-7px}
+.pesanan-btn[aria-current="page"]{box-shadow:0 0 0 2px rgba(255,255,255,.35) inset}
 
 </style>
 </head>
@@ -1048,6 +1051,7 @@ const ICONS = {
   wheel:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 14v8M10 12H2M14 12h8"/>',
   siren:'<path d="M7 18v-6a5 5 0 1 1 10 0v6M5 21a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1zM21 12h1M18.5 4.5 18 5M2 12h1M12 2v1M4.9 4.9l.7.7"/>',
   refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5"/>',
+  cart:'<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
   mark:'<path d="M4 17c3-9 13-9 16 0"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
   logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>'
 };
@@ -1310,30 +1314,27 @@ function renderChrome(base, isBiz){
   $('#top').innerHTML = `<div class="wrap">
     <a class="brand" href="#beranda"><span class="brand-mark">${ic('mark', 20)}</span>SYAILUN TRANS</a>
     ${isBiz ? `<span class="badge gold hide-m">${bizName}</span>` : `<nav class="nav" aria-label="Navigasi utama">
-      <a href="#beranda"${navOn('beranda')}>Beranda</a><a href="#cari"${navOn('cari')}>Cari kendaraan</a><a href="#akun" data-tab="pesanan"${navOn('akun')}>Pesanan saya</a><a href="#bantuan"${navOn('bantuan')}>Bantuan</a></nav>`}
+      <a href="#beranda"${navOn('beranda')}>Beranda</a><a href="#cari"${navOn('cari')}>Cari kendaraan</a><a href="#bantuan"${navOn('bantuan')}>Bantuan</a></nav>`}
     <div class="top-actions">
       ${isBiz ? `<a class="btn btn-secondary btn-sm" href="#beranda">${ic('logout', 18)}<span class="hide-m">Ke situs pelanggan</span></a>
        <button class="icon-btn" id="roleBtn" aria-label="Pilih portal">${ic('layout')}</button>` :
-      `<button class="icon-btn" id="roleBtn" aria-label="Pilih portal">${ic('layout')}</button>
-       <a class="btn btn-primary btn-sm hide-m" href="#cari">${ic('search', 18)}Cari kendaraan</a>
-       <a class="icon-btn" href="#akun" data-tab="profil" aria-label="Akun saya"${base === 'akun' ? ' aria-current="page"' : ''}>${ic('user')}</a>`}
+      `<a class="btn btn-primary btn-sm hide-m pesanan-btn" href="#akun" data-tab="pesanan"${base === 'akun' ? ' aria-current="page"' : ''}>${ic('cart', 18)}Pesanan Saya${act ? `<span class="count">${act}</span>` : ''}</a>`}
     </div></div>`;
   $('#bnav').innerHTML = isBiz ? '' : `
     <a href="#beranda"${navOn('beranda')}>${ic('home', 22)}Beranda</a>
     <a href="#cari"${navOn('cari')}>${ic('search', 22)}Cari</a>
-    <a href="#akun" data-tab="pesanan"${navOn('akun')}>${ic('ticket', 22)}Pesanan${act ? `<span class="count">${act}</span>` : ''}</a>
-    <a href="#bantuan"${navOn('bantuan')}>${ic('help', 22)}Bantuan</a>
-    <a href="#akun" data-tab="profil">${ic('user', 22)}Akun</a>`;
+    <a href="#akun" data-tab="pesanan"${navOn('akun')}>${ic('cart', 22)}Pesanan${act ? `<span class="count">${act}</span>` : ''}</a>
+    <a href="#bantuan"${navOn('bantuan')}>${ic('help', 22)}Bantuan</a>`;
   $('#bnav').hidden = isBiz;
   const s = S.settings;
   $('#foot').innerHTML = `<div class="wrap"><div class="fgrid">
     <div><a class="brand" href="#beranda" style="margin-bottom:12px"><span class="brand-mark">${ic('mark', 20)}</span>SYAILUN TRANS</a><p class="muted" style="font-size:.92rem;max-width:34ch">Sewa motor, mobil, dan minibus. Lepas kunci atau dengan sopir.</p></div>
-    <div><h4>Pelanggan</h4><a href="#cari">Cari kendaraan</a><a href="#akun" data-tab="pesanan">Pesanan saya</a><a href="#akun" data-tab="favorit">Favorit</a><a href="#bantuan">Bantuan</a></div>
-    <div><h4>Bisnis</h4><a href="#admin">Admin</a><a href="#superadmin">Super Admin</a></div>
+    <div><h4>Pelanggan</h4><a href="#cari">Cari kendaraan</a><a href="#akun" data-tab="pesanan">Pesanan Saya</a><a href="#akun" data-tab="favorit">Favorit</a><a href="#bantuan">Bantuan</a></div>
+    <div><h4>Pengelola</h4><a href="#masuk">Masuk pengelola</a></div>
     <div><h4>Kontak</h4><a href="${waLink(s.wa, 'Halo ' + s.nama)}" target="_blank" rel="noopener">WhatsApp admin</a><a href="${esc(s.maps || '#')}" target="_blank" rel="noopener">${esc(s.alamat)}</a><p class="muted" style="font-size:.92rem">${esc(s.jam)}</p></div>
-  </div><p class="muted" style="font-size:.84rem;margin-top:28px">© ${new Date().getFullYear()} ${esc(s.nama)}. Prototipe dalam mode demo.</p></div>`;
+  </div><p class="muted" style="font-size:.84rem;margin-top:28px">© ${new Date().getFullYear()} ${esc(s.nama)}. Rental motor &amp; mobil Kebumen.</p></div>`;
   $('#foot').hidden = isBiz;
-  $('#roleBtn').onclick = openPortals;
+  const rb = $('#roleBtn'); if(rb) rb.onclick = openPortals;
 }
 function openPortals(){ modal('Masuk ke portal', `<p class="muted" style="margin-bottom:16px">Admin dan Super Admin perlu masuk dengan akun pengelola. Pelanggan tidak perlu akun.</p>
     <div class="stack">${[['beranda','user','Pelanggan','Cari, pesan, dan kelola sewa'],['admin','clip','Admin','Armada, harga, reservasi, serah terima, perawatan, pendapatan'],['superadmin','layout','Super Admin','Kendali penuh: mitra, komisi, promo, pengaturan sistem']].map(r => `<a class="choice" href="#${r[0]}" data-close style="text-decoration:none"><span class="cat ci" style="padding:0;border:0;background:none">${ic(r[1], 22)}</span><span><b>${r[2]}</b><small>${r[3]}</small></span>${ic('chevR', 18, 'style="margin-left:auto;align-self:center"')}</a>`).join('')}</div>`); }
@@ -1951,9 +1952,9 @@ function bindSelesai(){ document.body.classList.remove('booking'); renderChrome(
 ROUTES.akun = () => {
   const tab = S.ui.akunTab || 'pesanan';
   const mine = S.bookings.filter(myBooking), aktif = mine.filter(b => LOCK.includes(b.status)), unread = S.notifs.filter(n => n.target === 'pelanggan' && !n.baca).length;
-  const tabs = [['pesanan', 'Pesanan', aktif.length], ['favorit', 'Favorit', S.favorit.length], ['profil', 'Profil & verifikasi', 0], ['notif', 'Notifikasi', unread]];
+  const tabs = [['pesanan', 'Pesanan', aktif.length], ['favorit', 'Favorit', S.favorit.length], ['profil', 'Data diri', 0], ['notif', 'Notifikasi', unread]];
   return `<div class="wrap" style="padding-top:28px">
-    <div class="sec-head akun-head"><div><h2>${S.profile.nama ? 'Halo, ' + esc(S.profile.nama.split(' ')[0]) : 'Akun saya'}</h2><p class="muted">Pesanan, favorit, dan profil yang tersimpan di perangkat ini.</p></div></div>
+    <div class="sec-head akun-head"><div><h2>Pesanan Saya</h2><p class="muted">${S.profile.nama ? 'Halo, ' + esc(S.profile.nama.split(' ')[0]) + '. ' : ''}Tanpa perlu daftar atau login. Pesanan dari perangkat lain bisa dicari dengan kode pesanan.</p></div></div>
     <div class="tabs" role="tablist">${tabs.map(t => `<button role="tab" data-atab="${t[0]}" aria-selected="${tab === t[0]}">${t[1]}${t[2] ? `<span class="count">${t[2]}</span>` : ''}</button>`).join('')}</div>
     <div id="akunBody">${({pesanan:akunPesanan, favorit:akunFavorit, profil:akunProfil, notif:akunNotif})[tab]()}</div>
   </div>`;
@@ -1978,7 +1979,40 @@ function bookingCard(b){
       ${canCancel ? `<button class="btn btn-ghost btn-sm" data-cancel="${b.id}">Batalkan</button>` : ''}
     </div></div>`;
 }
+function cariPesananHTML(){
+  return `<form class="card pad stack" id="cariPesanan" novalidate style="margin-bottom:18px"><div><h3>Cari pesanan saya</h3><p class="muted" style="font-size:.9rem">Memesan dari HP atau browser lain? Masukkan kode pesanan dan nomor WhatsApp yang dipakai saat memesan.</p></div>
+    <div class="grid3" style="align-items:end"><div class="fi"><label class="l" for="cpKode">Kode pesanan</label><input class="field" id="cpKode" placeholder="ST-XXXXXX" autocapitalize="characters" style="text-transform:uppercase"></div>
+    <div class="fi"><label class="l" for="cpHp">Nomor WhatsApp</label><input class="field" id="cpHp" inputmode="tel" placeholder="08…" value="${esc(S.profile.hp || '')}"></div>
+    <button class="btn btn-primary" type="submit" id="cpBtn">${ic('search', 18)}Cari pesanan</button></div></form>`;
+}
+function bindCariPesanan(){
+  const f = $('#cariPesanan'); if(!f) return;
+  f.onsubmit = async e => {
+    e.preventDefault();
+    let kode = $('#cpKode').value.trim().toUpperCase().replace(/\s+/g, ''); if(kode && !kode.startsWith('ST-')) kode = 'ST-' + kode.replace(/^ST/, '');
+    const hp = $('#cpHp').value.trim();
+    const ok = [fieldErr($('#cpKode'), !/^ST-[A-Z0-9]{4,10}$/.test(kode) ? 'Isi kode pesanan, contoh ST-3F9K2A.' : ''), fieldErr($('#cpHp'), !validHp(hp) ? 'Isi nomor WhatsApp yang dipakai saat memesan.' : '')].every(Boolean);
+    if(!ok) return;
+    const ada = S.bookings.find(b => b.id === kode && myBooking(b));
+    if(ada){ toast('Pesanan ini sudah ada di daftar Anda'); return; }
+    const btn = $('#cpBtn'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Mencari…';
+    try{
+      let b = null;
+      if(typeof DB !== 'undefined' && DB.online){ const rows = await rest.rpc('my_bookings', {p_ids:[kode], p_hp:hp}); if(rows && rows[0]) b = M.booking.from(rows[0]); }
+      else b = S.bookings.find(x => x.id === kode && normHp(x.pelanggan.hp) === normHp(hp)) || null;
+      if(!b){ fieldErr($('#cpKode'), 'Pesanan tidak ditemukan. Periksa kembali kode dan nomor WhatsApp.'); btn.disabled = false; btn.innerHTML = ic('search', 18) + 'Cari pesanan'; return; }
+      b.milikSaya = true;
+      const i = S.bookings.findIndex(x => x.id === b.id); if(i >= 0) S.bookings[i] = Object.assign(S.bookings[i], b); else S.bookings.unshift(b);
+      S.mine = S.mine || []; if(!S.mine.some(m => m.id === b.id)) S.mine.push({id:b.id, hp:hp});
+      if(typeof saveLocal === 'function' && typeof DB !== 'undefined' && DB.online){ saveLocal(); if(DB.staff) snapTake(); } else save();
+      toast('Pesanan ' + b.id + ' ditambahkan ke daftar Anda'); S.ui.akunTab = 'pesanan'; render();
+    }catch(x){ toast('Gagal mencari: ' + x.message, 'err'); btn.disabled = false; btn.innerHTML = ic('search', 18) + 'Cari pesanan'; }
+  };
+}
 function akunPesanan(){
+  return cariPesananHTML() + akunPesananList();
+}
+function akunPesananList(){
   const mine = S.bookings.filter(myBooking);
   if(!mine.length) return `<div class="card">${emptyState('ticket', 'Belum ada pesanan', 'Pesanan yang Anda buat di perangkat ini akan tampil di sini, lengkap dengan status dan rinciannya.', '<a class="btn btn-primary" href="#cari">Cari kendaraan</a>')}</div>`;
   const aktif = mine.filter(b => LOCK.includes(b.status)), riwayat = mine.filter(b => !LOCK.includes(b.status));
@@ -2000,6 +2034,7 @@ function invoiceHTML(b){
   </div>`;
 }
 function bindAkunPesanan(){
+  bindCariPesanan();
   $$('[data-inv]').forEach(x => x.onclick = () => { const b = S.bookings.find(y => y.id === x.dataset.inv); modal('Rincian pesanan', invoiceHTML(b), `<a class="btn btn-secondary" href="${waLink(S.settings.wa, waText(b))}" target="_blank" rel="noopener">${ic('wa', 18)}Hubungi admin</a><button class="btn btn-primary" data-close>Tutup</button>`); });
   $$('[data-cancel]').forEach(x => x.onclick = () => confirmBox('Batalkan pesanan?', `Pesanan ${x.dataset.cancel} akan dibatalkan dan tanggalnya dibuka kembali. ${esc(S.settings.batal)}`, 'Ya, batalkan', () => {
     const b = S.bookings.find(y => y.id === x.dataset.cancel); b.status = 'batal'; notify(`Pesanan ${b.id} dibatalkan.`); notify(`Pesanan ${b.id} dibatalkan pelanggan.`, 'ops'); save(); toast('Pesanan dibatalkan'); go('akun'); }, true));
@@ -2185,7 +2220,7 @@ addEventListener('hashchange', () => { const h = location.hash.slice(1) || 'bera
 function appBack(){ NAV.pop(); const prev = NAV.pop(); go(prev || 'beranda'); }
 
 const greet = () => { const h = new Date().getHours(); return h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam'; };
-const TITLES = {cari:'Cari kendaraan', pesan:'Pesan kendaraan', bayar:'Pembayaran', akun:'Akun saya', bantuan:'Bantuan'};
+const TITLES = {cari:'Cari kendaraan', pesan:'Pesan kendaraan', bayar:'Pembayaran', akun:'Pesanan Saya', bantuan:'Bantuan'};
 
 const webChrome = renderChrome;
 renderChrome = (base, isBiz) => {
@@ -2202,9 +2237,7 @@ renderChrome = (base, isBiz) => {
       : `<button class="icon-btn" id="appBack" aria-label="Kembali">${ic('chevL', 22)}</button><span class="tt">${esc(title)}</span>`}
     ${base === 'beranda' ? `<a class="icon-btn" href="#akun" data-tab="notif" aria-label="Notifikasi (${unread})">${ic('bell')}${unread ? `<span class="count">${unread}</span>` : ''}</a>` : ''}
     ${base !== 'kendaraan' ? `<a class="icon-btn" href="#akun" data-tab="favorit" aria-label="Favorit (${fav})">${ic('heart')}${fav ? `<span class="count">${fav}</span>` : ''}</a>` : ''}
-    <button class="icon-btn" id="roleBtn" aria-label="Pilih portal">${ic('layout')}</button>
   </div></div>`;
-  $('#roleBtn').onclick = openPortals;
   const bb = $('#appBack'); if(bb) bb.onclick = appBack;
 };
 
@@ -2291,7 +2324,7 @@ ROUTES.akun = () => {
   if(!APP) return webAkun();
   const p = S.profile, ini = (p.nama || 'Tamu').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
   const vs = {belum:'Belum diverifikasi', menunggu:'Menunggu verifikasi', terverifikasi:'Terverifikasi', ditolak:'Verifikasi ditolak'}[p.verifikasi || 'belum'];
-  const head = `<div class="app-prof"><span class="av">${esc(ini)}</span><div style="min-width:0"><b>${esc(p.nama || 'Tamu')}</b><small>${p.hp ? esc(p.hp) + ', ' : ''}${vs}</small></div></div>`;
+  const head = `<div class="app-prof"><span class="av">${esc(ini)}</span><div style="min-width:0"><b>${esc(p.nama || 'Tamu')}</b><small>${p.hp ? esc(p.hp) : 'Tanpa daftar atau login'}</small></div></div>`;
   return webAkun().replace('<div class="wrap" style="padding-top:28px">', '<div class="wrap" style="padding-top:16px">' + head);
 };
 ROUTES.akun.after = () => webAkunAfter();
